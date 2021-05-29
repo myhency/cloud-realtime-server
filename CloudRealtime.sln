@@ -1,0 +1,25 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.31105.61
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CloudRealtime", "CloudRealtime\CloudRealtime.csproj", "{69647D9C-BAEA-4A5B-BA2F-BA703CB0825C}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{69647D9C-BAEA-4A5B-BA2F-BA703CB0825C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{69647D9C-BAEA-4A5B-BA2F-BA703CB0825C}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{69647D9C-BAEA-4A5B-BA2F-BA703CB0825C}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{69647D9C-BAEA-4A5B-BA2F-BA703CB0825C}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {1316FF89-85BE-4559-9696-2E6A2D27BDEA}
+	EndGlobalSection
+EndGlobal
