@@ -52,8 +52,6 @@ namespace CloudRealtime.RealTime.service
                 var jObject = JObject.Parse(response.Content);
                 return jObject.GetValue("data").ToString();
             }
-
-            
         }
 
         public List<Alarm> getAlarmList()
