@@ -14,7 +14,7 @@ namespace CloudRealtime
     {
         private IAlrime iAlrime;
         private MyTelegramBot myTelegramBot;
-        private RealDataEventHandler realDataEventHandler;
+        //private RealDataEventHandler realDataEventHandler;
         private TrEventHandler trEventHandler;
         private AxKHOpenAPILib.AxKHOpenAPI axKHOpenAPI1;
         private List<MonitoringItem> longTermMonitoringItemList = new List<MonitoringItem>();
@@ -77,7 +77,7 @@ namespace CloudRealtime
             boxTradeStartRowTextBox.Text = ini["BoxTrade"]["RangeRowStart"].ToString();
             boxTradeEndRowTextBox.Text = ini["BoxTrade"]["RangeRowEnd"].ToString();
 
-            realDataEventHandler = new RealDataEventHandler(this,axKHOpenAPI);
+            //realDataEventHandler = new RealDataEventHandler(this,axKHOpenAPI);
             //trEventHandler = new TrEventHandler(this, axKHOpenAPI);
         }
 
@@ -109,12 +109,12 @@ namespace CloudRealtime
                     /// 17:고가
                     /// 18:저가
                     /// 30:전일거래량대비(계약,주)
-                    realDataEventHandler.setRealReg(
-                        "5000", 
-                        boxTradeMonitoringItemList[i].종목코드, 
-                        "20;10;11;12;15;13;14;16;17;18;30,290,9201", 
-                        "1"
-                    );
+                    //realDataEventHandler.setRealReg(
+                    //    "5000", 
+                    //    boxTradeMonitoringItemList[i].종목코드, 
+                    //    "20;10;11;12;15;13;14;16;17;18;30,290,9201", 
+                    //    "1"
+                    //);
                 }
             }
         }
