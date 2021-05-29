@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
 using System.Drawing;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading;
@@ -10,18 +11,22 @@ using System.Threading.Tasks;
 using System.Windows.Forms;
 using CloudRealtime.KiwoomAPI;
 using CloudRealtime.RealTime.controller;
-using RestSharp;
+using CloudRealtime.util;
+using NLog;
 
 namespace CloudRealtime
 {
     public partial class StockMiner : Form, IRealDataEventHandler, ITrEventHandler, IKiwoomAPI
     {
+        private static Logger Logger = LogManager.GetCurrentClassLogger();
         private DailyCrawler dailyCrawler;
         private Alrime alrime;
         private TrEventHandler trEventHandler;
-        private RealDataEventHandler realDataEventHandler;
+        //private RealDataEventHandler realDataEventHandler;
         private OtherFunctions otherFunctions;
         private RealTimeController realTimeController;
+        private static DateTime today = DateTime.Now;
+        private string strNow = today.ToString("yyyy-MM-dd");
 
         public StockMiner()
         {
@@ -29,14 +34,37 @@ namespace CloudRealtime
 
             axKHOpenAPI1.OnEventConnect += axKHOpenAPI1_OnEventConnect;
 
+            Console.WriteLine(AppDomain.CurrentDomain.BaseDirectory + "logs" + Path.DirectorySeparatorChar);
+            var watcher = new FileSystemWatcher();
+            watcher.Path = AppDomain.CurrentDomain.BaseDirectory + "logs";
+            watcher.NotifyFilter = NotifyFilters.LastWrite;
+            watcher.Filter = $"{strNow}.log";
+            watcher.Changed += new FileSystemEventHandler(Changed);
+            watcher.EnableRaisingEvents = true;
             login();
+        }
+
+        private void Changed(object sender, FileSystemEventArgs e)
+        {   
+            var log = File.ReadLines(
+                AppDomain.CurrentDomain.BaseDirectory
+                + "logs"
+                + Path.DirectorySeparatorChar
+                + $"{strNow}.log",
+                System.Text.Encoding.GetEncoding(949)
+                )
+                .Last();
+            this.Invoke(new Action(delegate ()
+            {
+                logRichTextBox.AppendText(log + "\n");
+            }));
         }
 
         private void axKHOpenAPI1_OnEventConnect(object sender, AxKHOpenAPILib._DKHOpenAPIEvents_OnEventConnectEvent e)
         {
             if (e.nErrCode == 0) //로그인 성공시
             {
-                Console.WriteLine("로그인성공");
+                Logger.Debug("로그인성공");
                 //데일리종목정보 초기화
                 //dailyCrawler = new DailyCrawler(this, axKHOpenAPI1);
 
@@ -56,7 +84,7 @@ namespace CloudRealtime
 
         private void login()
         {
-            Console.WriteLine("login start");
+            //Logger.Debug("login start");
             axKHOpenAPI1.CommConnect();
         }
 
@@ -77,7 +105,7 @@ namespace CloudRealtime
 
         public void setRealReg(string screenNumber, string itemCode, string fidList, string type)
         {
-            realDataEventHandler.setRealReg(screenNumber, itemCode, fidList, type);
+            //realDataEventHandler.setRealReg(screenNumber, itemCode, fidList, type);
         }
     }
 }

@@ -33,7 +33,7 @@ namespace CloudRealtime
             this.tabControl1 = new System.Windows.Forms.TabControl();
             this.tabPage1 = new System.Windows.Forms.TabPage();
             this.axKHOpenAPI1 = new AxKHOpenAPILib.AxKHOpenAPI();
-            this.logListBox = new System.Windows.Forms.ListBox();
+            this.logRichTextBox = new System.Windows.Forms.RichTextBox();
             this.tabControl1.SuspendLayout();
             this.tabPage1.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.axKHOpenAPI1)).BeginInit();
@@ -53,7 +53,7 @@ namespace CloudRealtime
             // 
             // tabPage1
             // 
-            this.tabPage1.Controls.Add(this.logListBox);
+            this.tabPage1.Controls.Add(this.logRichTextBox);
             this.tabPage1.Location = new System.Drawing.Point(4, 22);
             this.tabPage1.Name = "tabPage1";
             this.tabPage1.Padding = new System.Windows.Forms.Padding(3);
@@ -71,17 +71,16 @@ namespace CloudRealtime
             this.axKHOpenAPI1.Size = new System.Drawing.Size(83, 10);
             this.axKHOpenAPI1.TabIndex = 1;
             // 
-            // logListBox
+            // logRichTextBox
             // 
-            this.logListBox.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            this.logRichTextBox.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
             | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
-            this.logListBox.FormattingEnabled = true;
-            this.logListBox.ItemHeight = 12;
-            this.logListBox.Location = new System.Drawing.Point(3, 15);
-            this.logListBox.Name = "logListBox";
-            this.logListBox.Size = new System.Drawing.Size(811, 496);
-            this.logListBox.TabIndex = 0;
+            this.logRichTextBox.Location = new System.Drawing.Point(6, 6);
+            this.logRichTextBox.Name = "logRichTextBox";
+            this.logRichTextBox.Size = new System.Drawing.Size(805, 503);
+            this.logRichTextBox.TabIndex = 0;
+            this.logRichTextBox.Text = "";
             // 
             // StockMiner
             // 
@@ -104,7 +103,7 @@ namespace CloudRealtime
         private System.Windows.Forms.TabControl tabControl1;
         private System.Windows.Forms.TabPage tabPage1;
         private AxKHOpenAPILib.AxKHOpenAPI axKHOpenAPI1;
-        private System.Windows.Forms.ListBox logListBox;
+        private System.Windows.Forms.RichTextBox logRichTextBox;
     }
 }
 
