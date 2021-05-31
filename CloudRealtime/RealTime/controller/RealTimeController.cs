@@ -1,6 +1,7 @@
 ﻿using CloudRealtime.RealTime.handler;
 using CloudRealtime.RealTime.model;
 using CloudRealtime.RealTime.service;
+using CloudRealtime.util;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -15,17 +16,24 @@ namespace CloudRealtime.RealTime.controller
         private AlarmService alarmService;
         private RealDataEventHandler realDataEventHandler;
         private List<Alarm> alarmList;
+        private MyTelegramBot myTelegramBot;
 
         public RealTimeController(AxKHOpenAPILib.AxKHOpenAPI axKHOpenAPI)
         {
             this.axKHOpenAPI1 = axKHOpenAPI;
-            this.realDataEventHandler = new RealDataEventHandler(this, axKHOpenAPI);
             this.alarmService = new AlarmService();
+            this.myTelegramBot = new MyTelegramBot();
             //알리미서버에서 가져오는 알람리스트
             //TODO. 실시간으로 입력되는 알람은 Kafka consumer가 가져오도록 구현해야 함.
             this.alarmList = this.alarmService.getAlarmList();
-
+            this.realDataEventHandler = new RealDataEventHandler(this, axKHOpenAPI, this.alarmList);
+            this.myTelegramBot.sendTextMessageAsyncToBot("Test");
             initialize();
+        }
+
+        public void sendTextMessageAsyncToBot(string alarmMessage)
+        {
+            this.myTelegramBot.sendTextMessageAsyncToBot(alarmMessage);
         }
 
         private void initialize()

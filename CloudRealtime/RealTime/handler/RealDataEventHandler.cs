@@ -1,4 +1,5 @@
 ﻿using CloudRealtime.RealTime.controller;
+using CloudRealtime.RealTime.model;
 using NLog;
 using System;
 using System.Collections.Generic;
@@ -13,12 +14,18 @@ namespace CloudRealtime.RealTime.handler
         private static Logger Logger = LogManager.GetCurrentClassLogger();
         private AxKHOpenAPILib.AxKHOpenAPI axKHOpenAPI1;
         private IRealTimeController iRealTimeController;
+        private List<Alarm> alarmList;
         bool isMarketOpen = false;
 
-        public RealDataEventHandler(IRealTimeController iRealTimeController, AxKHOpenAPILib.AxKHOpenAPI axKHOpenAPI)
+        public RealDataEventHandler(
+            IRealTimeController iRealTimeController, 
+            AxKHOpenAPILib.AxKHOpenAPI axKHOpenAPI,
+            List<Alarm> alarmList
+        )
         {
             this.axKHOpenAPI1 = axKHOpenAPI;
             this.iRealTimeController = iRealTimeController;
+            this.alarmList = alarmList;
             axKHOpenAPI1.OnReceiveRealData += axKHOpenAPI1_OnReceiveRealData;
         }
 
@@ -53,7 +60,46 @@ namespace CloudRealtime.RealTime.handler
 
             if (e.sRealType.Equals("주식체결") && isMarketOpen)
             {
+                int presentPrice = Math.Abs(int.Parse(axKHOpenAPI1.GetCommRealData(e.sRealKey, 10))); //현재가
+                double fluctuationRate = double.Parse(axKHOpenAPI1.GetCommRealData(e.sRealKey, 12)); //등락율
 
+                Alarm alarm = this.alarmList.FirstOrDefault(v => v.itemCode.Equals(e.sRealKey));
+
+                if(presentPrice >= alarm.recommendPrice) //돌파가격보다 같거나 큰 경우
+                {
+                    //alarmList에서 해당종목을 제거한다.
+                    //알람을 전송한다.
+                    string message = $"📈 *가격돌파 알림* \n" +
+                        $"\n" +
+                        $"종목명 : *{alarm.itemName}* \n" +
+                        $"현재가 : *{presentPrice}* ({fluctuationRate}%)\n" +
+                        $"기준가격 {String.Format("{0:#,###}", alarm.recommendPrice)}원을 돌파했습니다. \n" +
+                        $"\n" +
+                        $"{alarm.comment} \n" +
+                        $"\n" +
+                        $"{alarm.theme}";
+                    iRealTimeController.sendTextMessageAsyncToBot(message);
+                    //알리미 서버에 업데이트 한다.
+                    
+                }
+
+                if(presentPrice <= alarm.losscutPrice) //손절가격보다 작거나 같은경우
+                {
+                    //alarmList에서 해당종목을 제거한다.
+                    //알람을 전송한다.
+                    string message = $"📉 *가격이탈 알림* \n" +
+                        $"\n" +
+                        $"종목명 : *{alarm.itemName}* \n" +
+                        $"현재가 : *{presentPrice}* ({fluctuationRate}%)\n" +
+                        $"기준가격 {String.Format("{0:#,###}", alarm.losscutPrice)}원을 이탈했습니다. \n" +
+                        $"\n" +
+                        $"{alarm.comment} \n" +
+                        $"\n" +
+                        $"{alarm.theme}";
+                    iRealTimeController.sendTextMessageAsyncToBot(message);
+                    //알리미 서버에 업데이트 한다.
+                    
+                }
             }
         }
     }

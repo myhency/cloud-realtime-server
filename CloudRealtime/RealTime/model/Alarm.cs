@@ -13,5 +13,7 @@ namespace CloudRealtime.RealTime.model
         public string itemCode { get; set; }
         public int recommendPrice { get; set; }
         public int losscutPrice { get; set; }
+        public string theme { get; set; }
+        public string comment { get; set; }
     }
 }

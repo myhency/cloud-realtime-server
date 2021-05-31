@@ -8,5 +8,6 @@ namespace CloudRealtime.RealTime.controller
 {
     public interface IRealTimeController
     {
+        void sendTextMessageAsyncToBot(string alarmMessage);
     }
 }
