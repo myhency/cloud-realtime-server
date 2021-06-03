@@ -79,16 +79,16 @@ namespace CloudRealtime.RealTime.handler
                     string message = $"📈 *가격돌파 알림* \n" +
                         $"\n" +
                         $"종목명 : *{alarm.itemName}* \n" +
-                        $"현재가 : *{presentPrice}* ({fluctuationRate}%)\n" +
                         $"기준가격 {String.Format("{0:#,###}", alarm.recommendPrice)}원을 돌파했습니다. \n" +
+                        $"현재가 : *{String.Format("{0:#,###}", presentPrice)}* ({fluctuationRate}%)\n" +
                         $"\n" +
                         $"{alarm.comment} \n" +
                         $"\n" +
                         $"{alarm.theme}";
                     iRealTimeController.sendTextMessageAsyncToBot(message);
-                    
-                    //알리미 서버에 알람상태를 업데이트 한다.
 
+                    //알리미 서버에 알람상태를 업데이트 한다.
+                    alarmService.buyAlarm(alarm.alarmId);
                 }
 
                 if (presentPrice <= alarm.losscutPrice 
@@ -101,15 +101,16 @@ namespace CloudRealtime.RealTime.handler
                     string message = $"📉 *가격이탈 알림* \n" +
                         $"\n" +
                         $"종목명 : *{alarm.itemName}* \n" +
-                        $"현재가 : *{presentPrice}* ({fluctuationRate}%)\n" +
                         $"기준가격 {String.Format("{0:#,###}", alarm.losscutPrice)}원을 이탈했습니다. \n" +
+                        $"현재가 : *{String.Format("{0:#,###}", presentPrice)}* ({fluctuationRate}%)\n" +
                         $"\n" +
                         $"{alarm.comment} \n" +
                         $"\n" +
                         $"{alarm.theme}";
                     iRealTimeController.sendTextMessageAsyncToBot(message);
-                    
+
                     //알리미 서버에 알람상태를 업데이트 한다.
+                    alarmService.losscutAlarm(alarm.alarmId);
                 }
             }
         }

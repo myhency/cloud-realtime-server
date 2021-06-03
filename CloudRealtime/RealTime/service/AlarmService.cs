@@ -92,5 +92,47 @@ namespace CloudRealtime.RealTime.service
                 return alarmList;
             }
         }
+
+        public void buyAlarm(long alarmId)
+        {
+            client = new RestClient(BASE_URL + $"/api/v1/platform/alarm/stockItem/buy/{alarmId}");
+            client.Timeout = -1;
+            request = new RestRequest(Method.PUT);
+            request.AddParameter("Authorization", "Bearer " + this.token, ParameterType.HttpHeader);
+
+            response = client.Execute(request);
+
+            if (response.StatusCode != System.Net.HttpStatusCode.OK)
+            {
+                Logger.Error("Error to change alarm status");
+                return;
+            }
+            else
+            {
+                Logger.Info("Success to change alarm status");
+                return;
+            }
+        }
+
+        public void losscutAlarm(long alarmId)
+        {
+            client = new RestClient(BASE_URL + $"/api/v1/platform/alarm/stockItem/losscut/{alarmId}");
+            client.Timeout = -1;
+            request = new RestRequest(Method.PUT);
+            request.AddParameter("Authorization", "Bearer " + this.token, ParameterType.HttpHeader);
+
+            response = client.Execute(request);
+
+            if (response.StatusCode != System.Net.HttpStatusCode.OK)
+            {
+                Logger.Error("Error to change alarm status");
+                return;
+            }
+            else
+            {
+                Logger.Info("Success to change alarm status");
+                return;
+            }
+        }
     }
 }
