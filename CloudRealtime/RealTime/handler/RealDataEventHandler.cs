@@ -1,5 +1,6 @@
 ﻿using CloudRealtime.RealTime.controller;
 using CloudRealtime.RealTime.model;
+using CloudRealtime.RealTime.service;
 using NLog;
 using System;
 using System.Collections.Generic;
@@ -13,7 +14,9 @@ namespace CloudRealtime.RealTime.handler
     {
         private static Logger Logger = LogManager.GetCurrentClassLogger();
         private AxKHOpenAPILib.AxKHOpenAPI axKHOpenAPI1;
+        private AlarmService alarmService;
         private IRealTimeController iRealTimeController;
+
         private List<Alarm> alarmList;
         bool isMarketOpen = false;
 
@@ -25,6 +28,7 @@ namespace CloudRealtime.RealTime.handler
         {
             this.axKHOpenAPI1 = axKHOpenAPI;
             this.iRealTimeController = iRealTimeController;
+            this.alarmService = new AlarmService();
             this.alarmList = alarmList;
             axKHOpenAPI1.OnReceiveRealData += axKHOpenAPI1_OnReceiveRealData;
         }
@@ -58,17 +62,20 @@ namespace CloudRealtime.RealTime.handler
                 }
             }
 
-            if (e.sRealType.Equals("주식체결") && isMarketOpen)
+            if (e.sRealType.Equals("주식체결") && alarmList.Exists(v => v.itemCode == e.sRealKey) && isMarketOpen)
             {
                 int presentPrice = Math.Abs(int.Parse(axKHOpenAPI1.GetCommRealData(e.sRealKey, 10))); //현재가
                 double fluctuationRate = double.Parse(axKHOpenAPI1.GetCommRealData(e.sRealKey, 12)); //등락율
 
                 Alarm alarm = this.alarmList.FirstOrDefault(v => v.itemCode.Equals(e.sRealKey));
 
-                if(presentPrice >= alarm.recommendPrice) //돌파가격보다 같거나 큰 경우
+                if(presentPrice >= alarm.recommendPrice 
+                    && alarm.alarmStatus.Equals("ALARM_CREATED")) //돌파가격보다 같거나 큰 경우
                 {
-                    //alarmList에서 해당종목을 제거한다.
-                    //알람을 전송한다.
+                    //COMPLETE. alarmList에서 해당종목을 제거한다.
+                    alarmList.Remove(alarm);
+
+                    //COMPLETE. 알람을 전송한다.
                     string message = $"📈 *가격돌파 알림* \n" +
                         $"\n" +
                         $"종목명 : *{alarm.itemName}* \n" +
@@ -79,14 +86,18 @@ namespace CloudRealtime.RealTime.handler
                         $"\n" +
                         $"{alarm.theme}";
                     iRealTimeController.sendTextMessageAsyncToBot(message);
-                    //알리미 서버에 업데이트 한다.
                     
+                    //알리미 서버에 알람상태를 업데이트 한다.
+
                 }
 
-                if(presentPrice <= alarm.losscutPrice) //손절가격보다 작거나 같은경우
+                if (presentPrice <= alarm.losscutPrice 
+                    && (alarm.alarmStatus.Equals("ALARM_CREATED") || alarm.alarmStatus.Equals("ALARMED"))) //손절가격보다 작거나 같은경우
                 {
-                    //alarmList에서 해당종목을 제거한다.
-                    //알람을 전송한다.
+                    //COMPLETE. alarmList에서 해당종목을 제거한다.
+                    alarmList.Remove(alarm);
+
+                    //COMPLETE. 알람을 전송한다.
                     string message = $"📉 *가격이탈 알림* \n" +
                         $"\n" +
                         $"종목명 : *{alarm.itemName}* \n" +
@@ -97,8 +108,8 @@ namespace CloudRealtime.RealTime.handler
                         $"\n" +
                         $"{alarm.theme}";
                     iRealTimeController.sendTextMessageAsyncToBot(message);
-                    //알리미 서버에 업데이트 한다.
                     
+                    //알리미 서버에 알람상태를 업데이트 한다.
                 }
             }
         }

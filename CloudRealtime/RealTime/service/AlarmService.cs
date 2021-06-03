@@ -84,7 +84,8 @@ namespace CloudRealtime.RealTime.service
                         recommendPrice = int.Parse(item.GetValue("recommendPrice").ToString()),
                         losscutPrice = int.Parse(item.GetValue("losscutPrice").ToString()),
                         theme = item.GetValue("theme").ToString(),
-                        comment = item.GetValue("comment").ToString()
+                        comment = item.GetValue("comment").ToString(),
+                        alarmStatus = item.GetValue("alarmStatus").ToString()
                     });
                 }
 

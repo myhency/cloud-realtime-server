@@ -15,5 +15,6 @@ namespace CloudRealtime.RealTime.model
         public int losscutPrice { get; set; }
         public string theme { get; set; }
         public string comment { get; set; }
+        public string alarmStatus { get; set; }
     }
 }
