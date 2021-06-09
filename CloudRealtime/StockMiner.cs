@@ -75,7 +75,7 @@ namespace CloudRealtime
                 //trEventHandler = new TrEventHandler(this, axKHOpenAPI1);
 
                 //기타함수 초기화
-                otherFunctions = new OtherFunctions(this, axKHOpenAPI1);
+                otherFunctions = new OtherFunctions(axKHOpenAPI1);
 
                 //가격수집서비스 초기화
                 realTimeController = new RealTimeController(axKHOpenAPI1);

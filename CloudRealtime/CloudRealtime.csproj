@@ -195,6 +195,8 @@
     <Compile Include="RealTime\model\Alarm.cs" />
     <Compile Include="RealTime\service\AlarmService.cs" />
     <Compile Include="Settings.cs" />
+    <Compile Include="StockItem\controller\StockItemController.cs" />
+    <Compile Include="StockItem\service\StockItemService.cs" />
     <Compile Include="util\Ini.cs" />
     <Compile Include="KiwoomAPI\IKiwoomAPI.cs" />
     <Compile Include="KiwoomAPI\OtherFunctions.cs" />
@@ -269,6 +271,7 @@
     <Service Include="{508349B6-6B84-4DF5-91F0-309BEEBAD82D}" />
   </ItemGroup>
   <ItemGroup>
+    <Folder Include="StockItem\model\" />
     <Folder Include="TeleBot\" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

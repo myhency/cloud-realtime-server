@@ -10,11 +10,9 @@ namespace CloudRealtime
     public partial class OtherFunctions
     {
         private AxKHOpenAPILib.AxKHOpenAPI axKHOpenAPI1;
-        private IKiwoomAPI kiwoomAPI;
 
-        public OtherFunctions(IKiwoomAPI kiwoomAPI, AxKHOpenAPILib.AxKHOpenAPI axKHOpenAPI)
+        public OtherFunctions(AxKHOpenAPILib.AxKHOpenAPI axKHOpenAPI)
         {
-            this.kiwoomAPI = kiwoomAPI;
             this.axKHOpenAPI1 = axKHOpenAPI;
         }
 
@@ -52,6 +50,11 @@ namespace CloudRealtime
             }
             
             return result;
+        }
+
+        public String GetMasterCodeName(String itemCode)
+        {
+            return this.axKHOpenAPI1.GetMasterCodeName(itemCode).Trim();
         }
     }
 }
