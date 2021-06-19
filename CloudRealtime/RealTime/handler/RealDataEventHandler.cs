@@ -33,6 +33,11 @@ namespace CloudRealtime.RealTime.handler
             axKHOpenAPI1.OnReceiveRealData += axKHOpenAPI1_OnReceiveRealData;
         }
 
+        public void setAlarmList(List<Alarm> alarmList)
+        {
+            this.alarmList = alarmList;
+        }
+
         public void setRealReg(string screenNumber, string itemCode, string fidList, string type)
         {
             this.axKHOpenAPI1.SetRealReg(screenNumber, itemCode, fidList, type);
@@ -93,7 +98,7 @@ namespace CloudRealtime.RealTime.handler
                 }
 
                 if (presentPrice <= alarm.losscutPrice 
-                    && (alarm.alarmStatus.Equals("ALARM_CREATED") || alarm.alarmStatus.Equals("ALARMED"))) //손절가격보다 작거나 같은경우
+                    && alarm.alarmStatus.Equals("ALARMED")) //손절가격보다 작거나 같은경우
                 {
                     //COMPLETE. alarmList에서 해당종목을 제거한다.
                     alarmList.Remove(alarm);

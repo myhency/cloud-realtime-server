@@ -1,4 +1,5 @@
-﻿using System;
+﻿using CloudRealtime.RealTime.model;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -9,5 +10,7 @@ namespace CloudRealtime
     public interface IRealDataEventHandler
     {
         void setRealReg(string screenNumber, string itemCode, string fidList, string type);
+
+        void setAlarmList(List<Alarm> alarmList);
     }
 }

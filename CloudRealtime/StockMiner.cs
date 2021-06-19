@@ -11,6 +11,7 @@ using System.Threading.Tasks;
 using System.Windows.Forms;
 using CloudRealtime.KiwoomAPI;
 using CloudRealtime.RealTime.controller;
+using CloudRealtime.RealTime.model;
 using CloudRealtime.util;
 using NLog;
 
@@ -106,6 +107,11 @@ namespace CloudRealtime
         public void setRealReg(string screenNumber, string itemCode, string fidList, string type)
         {
             //realDataEventHandler.setRealReg(screenNumber, itemCode, fidList, type);
+        }
+
+        public void setAlarmList(List<Alarm> alarmList)
+        {
+            //throw new NotImplementedException();
         }
     }
 }
