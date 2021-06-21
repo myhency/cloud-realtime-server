@@ -49,7 +49,7 @@ namespace CloudRealtime.RealTime.handler
             DateTime startMarketTime = new DateTime(today.Year, today.Month, today.Day, 09, 0, 0);
             string strNow = today.ToString("yyyy-MM-dd HH:mm:ss");
 
-            Console.WriteLine(e.sRealType);
+            //Console.WriteLine(e.sRealType);
 
             //장시작시간 체크
             if (today > startMarketTime)
