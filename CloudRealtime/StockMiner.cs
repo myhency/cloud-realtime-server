@@ -35,7 +35,7 @@ namespace CloudRealtime
 
             axKHOpenAPI1.OnEventConnect += axKHOpenAPI1_OnEventConnect;
 
-            Console.WriteLine(AppDomain.CurrentDomain.BaseDirectory + "logs" + Path.DirectorySeparatorChar);
+            //Console.WriteLine(AppDomain.CurrentDomain.BaseDirectory + "logs" + Path.DirectorySeparatorChar);
             var watcher = new FileSystemWatcher();
             watcher.Path = AppDomain.CurrentDomain.BaseDirectory + "logs";
             watcher.NotifyFilter = NotifyFilters.LastWrite;
