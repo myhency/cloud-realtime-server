@@ -10,6 +10,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using CloudRealtime.KiwoomAPI;
+using CloudRealtime.RealCondition.controller;
 using CloudRealtime.RealTime.controller;
 using CloudRealtime.RealTime.model;
 using CloudRealtime.util;
@@ -26,6 +27,7 @@ namespace CloudRealtime
         //private RealDataEventHandler realDataEventHandler;
         private OtherFunctions otherFunctions;
         private RealTimeController realTimeController;
+        private RealConditionController realConditionController;
         private static DateTime today = DateTime.Now;
         private string strNow = today.ToString("yyyy-MM-dd");
 
@@ -78,8 +80,13 @@ namespace CloudRealtime
                 //기타함수 초기화
                 otherFunctions = new OtherFunctions(axKHOpenAPI1);
 
-                //가격수집서비스 초기화
+                //가격수집 서비스 초기화
                 realTimeController = new RealTimeController(axKHOpenAPI1);
+
+                //조건검색 서비스 초기화
+                realConditionController = new RealConditionController(axKHOpenAPI1);
+
+                //realConditionController.sendCondition("유통거래량_코스피", false);
             }
         }
 

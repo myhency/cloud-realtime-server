@@ -186,6 +186,10 @@
     <Compile Include="Alrime.cs" />
     <Compile Include="DailyCrawler.cs" />
     <Compile Include="IAlrime.cs" />
+    <Compile Include="RealCondition\controller\RealConditionController.cs" />
+    <Compile Include="RealCondition\handler\Opt10001EventHandler.cs" />
+    <Compile Include="RealCondition\handler\RealConditionEventHandler.cs" />
+    <Compile Include="RealCondition\model\Condition.cs" />
     <Compile Include="RealTime\handler\IRealDataEventHandler.cs" />
     <Compile Include="ITrader.cs" />
     <Compile Include="KiwoomAPI\OrderEventHandler.cs" />
@@ -277,7 +281,6 @@
   </ItemGroup>
   <ItemGroup>
     <Folder Include="StockItem\model\" />
-    <Folder Include="TeleBot\" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">
