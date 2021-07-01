@@ -93,7 +93,7 @@ namespace CloudRealtime.RealTime.handler
                         $"\n" +
                         $"{alarm.theme} \n" +
                         $"\n" +
-                        $"https://m.alphasquare.co.kr/service/chart?code={alarm.itemCode}";
+                        $"https://m.alphasquare.co.kr/service/chart?code=" + alarm.itemCode;
                     iRealTimeController.sendTextMessageAsyncToBot(message);
 
                     //알리미 서버에 알람상태를 업데이트 한다.
@@ -115,7 +115,9 @@ namespace CloudRealtime.RealTime.handler
                         $"\n" +
                         $"{alarm.comment} \n" +
                         $"\n" +
-                        $"{alarm.theme}";
+                        $"{alarm.theme} \n" + 
+                        $"\n" +
+                        $"https://m.alphasquare.co.kr/service/chart?code=" + alarm.itemCode;
                     iRealTimeController.sendTextMessageAsyncToBot(message);
 
                     //알리미 서버에 알람상태를 업데이트 한다.
