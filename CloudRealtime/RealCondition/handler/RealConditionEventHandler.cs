@@ -4,6 +4,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace CloudRealtime.RealCondition.handler
@@ -57,11 +58,16 @@ namespace CloudRealtime.RealCondition.handler
             {
                 if (itemCode.Length > 0)
                 {
-                    this.opt10001EventHandler.requestTrOpt10001(itemCode, $"관심종목저장TR요청_{e.strConditionName}");
+                    this.opt10001EventHandler.requestTrOpt10001(itemCode, $"종목저장TR요청_{e.strConditionName}");
                 }
 
-                //Thread.Sleep(3000);
+                Thread.Sleep(1500);
+                //break;
             }
+
+            //Thread.Sleep(10000);
+
+            //this.opt10001EventHandler.sendFileAsyncToBot();
         }
 
         private void axKHOpenAPI1_OnReceiveConditionVer(object sender, AxKHOpenAPILib._DKHOpenAPIEvents_OnReceiveConditionVerEvent e)
@@ -85,23 +91,62 @@ namespace CloudRealtime.RealCondition.handler
                 }
             }
 
-            sendCondition("유통거래량_코스피", false);
+            //TODO.test 후에 주석 풀기
+            //Thread t1 = new Thread(new ThreadStart(() =>
+            //{
+            //    Logger.Info("유통거래량 쓰레드 시작");
+            //    TimeSpan triggerTime = new TimeSpan(15, 40, 0);
+            //    while (true)
+            //    {
+            //        TimeSpan timeNow = DateTime.Now.TimeOfDay;
+
+            //        if (timeNow > triggerTime)
+            //        {
+            //            //Thread.Sleep(180000);
+            //            sendCondition("3000","유통거래량_코스피", true);
+            //            break;
+            //        }
+            //    }
+            //}));
+
+            //t1.Start();
+
+            //Thread t2 = new Thread(new ThreadStart(() =>
+            //{
+            //    Logger.Info("유통거래량 쓰레드 시작");
+            //    TimeSpan triggerTime = new TimeSpan(15, 40, 0);
+            //    while (true)
+            //    {
+            //        TimeSpan timeNow = DateTime.Now.TimeOfDay;
+
+            //        if (timeNow > triggerTime)
+            //        {
+            //            sendCondition("3001", "유통거래량_코스닥", true);
+            //            break;
+            //        }
+            //    }
+            //}));
+
+            //t2.Start();
+
+            sendCondition("3000", "유통거래량_코스피", false);
+            //sendCondition("3001","유통거래량_코스닥", false);
         }
 
-        public void sendCondition(string conditionName, bool isRealTime)
+        public void sendCondition(string screenNumber, string conditionName, bool isRealTime)
         {
             Logger.Debug("sendCondition");
             foreach (Condition item in this.conditionList)
             {
                 if (item.name.Equals(conditionName))
                 {
-                    axKHOpenAPI1.SendCondition(
-                        "3000",
+                    int result = axKHOpenAPI1.SendCondition(
+                        screenNumber,
                         item.name,
                         item.index,
                         isRealTime ? 1 : 0
                     );
-
+                    Logger.Info("sendcondition result: " + result);
                     break;
                 }
             }

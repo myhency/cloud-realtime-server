@@ -1,8 +1,12 @@
-﻿using NLog;
+﻿using CloudRealtime.RealCondition.service;
+using CloudRealtime.util;
+using NLog;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace CloudRealtime.RealCondition.handler
@@ -11,11 +15,16 @@ namespace CloudRealtime.RealCondition.handler
     {
         private static Logger logger = LogManager.GetCurrentClassLogger();
         private AxKHOpenAPILib.AxKHOpenAPI axKHOpenAPI1;
+        private StockItemService stockItemService;
+        private MyTelegramBot myTelegramBot;
         private int screenNumber = 1000;
+        private string path;
 
         public Opt10001EventHandler(AxKHOpenAPILib.AxKHOpenAPI axKHOpenAPI)
         {
             this.axKHOpenAPI1 = axKHOpenAPI;
+            this.myTelegramBot = new MyTelegramBot();
+            this.stockItemService = new StockItemService();
             this.axKHOpenAPI1.OnReceiveTrData += axKHOpenAPI1_OnReceiveTrData;
         }
 
@@ -35,11 +44,43 @@ namespace CloudRealtime.RealCondition.handler
                 Opt10001VO opt10001VO = getOpt10001VO(e.sTrCode, e.sRQName);
                 logger.Debug(e.sTrCode);
                 logger.Debug(e.sRQName);
+                DateTime today = DateTime.Now;
+                DateTime startMarketTime = new DateTime(today.Year, today.Month, today.Day);
+                string strNow = today.ToString("yyyy-MM-dd");
 
-                string conditionName = e.sRQName.Split('_')[2];
+                //string theme = stockItemService.getTheme(opt10001VO.종목코드);
+                string theme = "ffff";
+                //Thread.Sleep(1000);
 
+                string conditionName = e.sRQName.Split('_')[2]+ e.sRQName.Split('_')[3];
+                this.path = conditionName.Contains("코스피") ? $"{AppDomain.CurrentDomain.BaseDirectory}\\admin\\{strNow}_코스피.csv" : $"{AppDomain.CurrentDomain.BaseDirectory}\\admin\\{strNow}_코스닥.csv";
+                var csv = new StringBuilder();
+                var newLine = $"{opt10001VO.종목명}|{opt10001VO.현재가}원|{opt10001VO.등락율}%|" +
+                    $"{opt10001VO.거래량}|{(opt10001VO.거래량/(opt10001VO.유통주식*1000))*100}%|" +
+                    $"{opt10001VO.시가총액}억|{theme}";
+
+                if (!File.Exists(this.path))
+                {
+                    FileStream f = File.Create(this.path);
+                    f.Close();
+                    logger.Info($"File Created!! {this.path}");
+                    var header = "종목명|현재가|등락율|거래량|유통주식|시가총액|테마";
+                    csv.AppendLine(header);
+                    File.WriteAllText(this.path, csv.ToString());
+                }
+
+                csv.AppendLine(newLine);
+                File.AppendAllText(this.path, csv.ToString());
+
+
+                // TODO. To be removed
                 //googleSheet.updateCodeListToGoogleSheet(opt10001VO, conditionName);
             }
+        }
+
+        public void sendFileAsyncToBot()
+        {
+            myTelegramBot.sendFileAsyncToBot(this.path);
         }
 
         private Opt10001VO getOpt10001VO(string sTrCode, string sRQName)

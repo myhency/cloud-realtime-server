@@ -38,30 +38,30 @@ namespace CloudRealtime
             axKHOpenAPI1.OnEventConnect += axKHOpenAPI1_OnEventConnect;
 
             //Console.WriteLine(AppDomain.CurrentDomain.BaseDirectory + "logs" + Path.DirectorySeparatorChar);
-            var watcher = new FileSystemWatcher();
-            watcher.Path = AppDomain.CurrentDomain.BaseDirectory + "logs";
-            watcher.NotifyFilter = NotifyFilters.LastWrite;
-            watcher.Filter = $"{strNow}.log";
-            watcher.Changed += new FileSystemEventHandler(Changed);
-            watcher.EnableRaisingEvents = true;
+            //var watcher = new FileSystemWatcher();
+            //watcher.Path = AppDomain.CurrentDomain.BaseDirectory + "logs";
+            //watcher.NotifyFilter = NotifyFilters.LastWrite;
+            //watcher.Filter = $"{strNow}.log";
+            //watcher.Changed += new FileSystemEventHandler(Changed);
+            //watcher.EnableRaisingEvents = true;
             login();
         }
 
-        private void Changed(object sender, FileSystemEventArgs e)
-        {   
-            var log = File.ReadLines(
-                AppDomain.CurrentDomain.BaseDirectory
-                + "logs"
-                + Path.DirectorySeparatorChar
-                + $"{strNow}.log",
-                System.Text.Encoding.GetEncoding(949)
-                )
-                .Last();
-            this.Invoke(new Action(delegate ()
-            {
-                logRichTextBox.AppendText(log + "\n");
-            }));
-        }
+        //private void Changed(object sender, FileSystemEventArgs e)
+        //{   
+        //    var log = File.ReadLines(
+        //        AppDomain.CurrentDomain.BaseDirectory
+        //        + "logs"
+        //        + Path.DirectorySeparatorChar
+        //        + $"{strNow}.log",
+        //        System.Text.Encoding.GetEncoding(949)
+        //        )
+        //        .Last();
+        //    this.Invoke(new Action(delegate ()
+        //    {
+        //        logRichTextBox.AppendText(log + "\n");
+        //    }));
+        //}
 
         private void axKHOpenAPI1_OnEventConnect(object sender, AxKHOpenAPILib._DKHOpenAPIEvents_OnEventConnectEvent e)
         {

@@ -190,6 +190,7 @@
     <Compile Include="RealCondition\handler\Opt10001EventHandler.cs" />
     <Compile Include="RealCondition\handler\RealConditionEventHandler.cs" />
     <Compile Include="RealCondition\model\Condition.cs" />
+    <Compile Include="RealCondition\service\StockItemService.cs" />
     <Compile Include="RealTime\handler\IRealDataEventHandler.cs" />
     <Compile Include="ITrader.cs" />
     <Compile Include="KiwoomAPI\OrderEventHandler.cs" />

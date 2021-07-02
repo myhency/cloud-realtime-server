@@ -7,7 +7,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace CloudRealtime.StockItem.service
+namespace CloudRealtime.RealCondition.service
 {
     public partial class StockItemService
     {
@@ -21,6 +21,7 @@ namespace CloudRealtime.StockItem.service
         public StockItemService()
         {
             this.token = getToken();
+            Console.WriteLine(this.token);
         }
 
         private string getToken()
@@ -53,9 +54,29 @@ namespace CloudRealtime.StockItem.service
             }
         }
 
-        public void updateStockItem()
+        public string getTheme(string itemCode)
         {
+            client = new RestClient(BASE_URL + $"/api/v1/platform/item/stockItem/theme/{itemCode}");
+            client.Timeout = -1;
+            request = new RestRequest(Method.GET);
+            request.AddParameter("Authorization", "Bearer " + this.token, ParameterType.HttpHeader);
 
+            response = client.Execute(request);
+
+            if (response.StatusCode != System.Net.HttpStatusCode.OK)
+            {
+                Logger.Error("Error to get theme");
+                return null;
+            }
+            else
+            {
+                Logger.Info("Success to get theme");
+                var result = JObject.Parse(response.Content).GetValue("theme");
+
+                return result.ToString();
+            }
         }
     }
+
+
 }

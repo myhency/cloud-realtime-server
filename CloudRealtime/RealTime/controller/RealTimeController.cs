@@ -36,7 +36,7 @@ namespace CloudRealtime.RealTime.controller
             //TODO. 실시간으로 입력되는 알람은 Kafka consumer가 가져오도록 구현해야 함.
             this.alarmList = this.alarmService.getAlarmList();
             this.realDataEventHandler = new RealDataEventHandler(this, axKHOpenAPI, this.alarmList);
-            //this.myTelegramBot.sendTextMessageAsyncToBot($"🤑 {strNow} 클라우드의 주식 훈련소알리미 출발합니다 🤑");
+            this.myTelegramBot.sendTextMessageAsyncToBot($"🤑 {strNow} 클라우드의 주식 훈련소알리미 출발합니다 🤑");
             initialize();
         }
 

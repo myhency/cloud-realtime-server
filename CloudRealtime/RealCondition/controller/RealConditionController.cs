@@ -21,9 +21,9 @@ namespace CloudRealtime.RealCondition.controller
             //this.realConditionEventHandler.sendCondition("유통거래량_코스피", false);
         }
 
-        public void sendCondition(string conditionName, bool isRealTime)
-        {
-            this.realConditionEventHandler.sendCondition(conditionName, isRealTime);
-        }
+        //public void sendCondition(string conditionName, bool isRealTime)
+        //{
+        //    this.realConditionEventHandler.sendCondition(conditionName, isRealTime);
+        //}
     }
 }
