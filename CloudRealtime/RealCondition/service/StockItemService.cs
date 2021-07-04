@@ -76,6 +76,39 @@ namespace CloudRealtime.RealCondition.service
                 return result.ToString();
             }
         }
+
+        public void createVolume(Opt10001VO opt10001VO)
+        {
+            client = new RestClient(BASE_URL + $"/api/v1/platform/analyze/volumeByShares");
+            client.Timeout = -1;
+            request = new RestRequest(Method.POST);
+            request.RequestFormat = DataFormat.Json;
+            request.AddParameter("Authorization", "Bearer " + this.token, ParameterType.HttpHeader);
+            request.AddJsonBody(new
+            {
+                itemName = opt10001VO.종목명,
+                itemCode = opt10001VO.종목코드,
+                closingPrice = opt10001VO.현재가,
+                fluctuationRate = opt10001VO.등락율,
+                volume = opt10001VO.거래량,
+                numberOfOutstandingShares = opt10001VO.유통주식,
+                marketCap = opt10001VO.시가총액,
+                marketType = opt10001VO.거래소구분,
+            });
+
+            response = client.Execute(request);
+
+            if (response.StatusCode != System.Net.HttpStatusCode.Created)
+            {
+                Logger.Error("Error to create volume");
+                return;
+            }
+            else
+            {
+                Logger.Info("Success to create volume");
+                return;
+            }
+        }
     }
 
 
