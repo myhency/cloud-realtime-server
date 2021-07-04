@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -7,6 +8,7 @@ using System.Windows.Forms;
 using Telegram.Bot;
 using Telegram.Bot.Args;
 using Telegram.Bot.Types.Enums;
+using Telegram.Bot.Types.InputFiles;
 using Telegram.Bot.Types.ReplyMarkups;
 
 namespace CloudRealtime.util
@@ -95,6 +97,15 @@ namespace CloudRealtime.util
         public void sendTextMessageAsyncToBot(string alarmMessage)
         {
             bot.SendTextMessageAsync(long.Parse(this.userId), alarmMessage, parseMode: ParseMode.Markdown);
+        }
+
+        public void sendFileAsyncToBot(string path)
+        {
+            using (FileStream fs = System.IO.File.OpenRead(path))
+            {
+                InputOnlineFile inputOnlineFile = new InputOnlineFile(fs, path);
+                bot.SendDocumentAsync(long.Parse(this.userId), inputOnlineFile);
+            }
         }
     }
 }

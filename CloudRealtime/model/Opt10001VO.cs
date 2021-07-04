@@ -4,6 +4,7 @@ namespace CloudRealtime
 {
     public class Opt10001VO
     {
+        public string 거래소구분 { get; set; }
         public string 종목코드 { get; set; }
         public string 종목명 { get; set; }
         public string 결산월 { get; set; }
