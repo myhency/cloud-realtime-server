@@ -1,4 +1,5 @@
 ﻿using CloudRealtime.RealCondition.model;
+using CloudRealtime.util;
 using NLog;
 using System;
 using System.Collections.Generic;
@@ -15,6 +16,7 @@ namespace CloudRealtime.RealCondition.handler
         private static Logger Logger = LogManager.GetCurrentClassLogger();
         private AxKHOpenAPILib.AxKHOpenAPI axKHOpenAPI1;
         private Opt10001EventHandler opt10001EventHandler;
+        private MyTelegramBot myTelegramBot;
         private List<Condition> conditionList;
         private BindingList<string> stockItemList;
         string[] itemCodeList = { };
@@ -23,6 +25,7 @@ namespace CloudRealtime.RealCondition.handler
         {
             this.axKHOpenAPI1 = axKHOpenAPI;
             this.opt10001EventHandler = new Opt10001EventHandler(axKHOpenAPI);
+            this.myTelegramBot = new MyTelegramBot();
             this.stockItemList = new BindingList<string>();
             initialize();
         }
@@ -50,8 +53,8 @@ namespace CloudRealtime.RealCondition.handler
             // TODO.test 후에 주석 풀기
             Thread t1 = new Thread(new ThreadStart(() =>
             {
-                Logger.Info("유통거래량 쓰레드 시작");
-                TimeSpan triggerTime = new TimeSpan(15, 40, 0);
+                Logger.Info("유통거래량 전송 쓰레드 시작");
+                TimeSpan triggerTime = new TimeSpan(16, 0, 0);
                 while (true)
                 {
                     TimeSpan timeNow = DateTime.Now.TimeOfDay;
@@ -61,7 +64,17 @@ namespace CloudRealtime.RealCondition.handler
                         sendCondition("3000", "유통거래량", false);
                         break;
                     }
+                }
+            }));
 
+            t1.Start();
+
+            Thread t2 = new Thread(new ThreadStart(() =>
+            {
+                Logger.Info("유통거래량 수집 쓰레드 시작");
+                TimeSpan triggerTime = new TimeSpan(16, 0, 0);
+                while (true)
+                {
                     if (itemCodeList.Length > 0)
                     {
                         foreach (string itemCode in itemCodeList)
@@ -73,11 +86,22 @@ namespace CloudRealtime.RealCondition.handler
                                 itemCodeList = itemCodeList.Where(v => v != itemCode).ToArray();
                             }
                         }
+
+                        Thread.Sleep(60000);
+                        DateTime today = DateTime.Now;
+                        DateTime startMarketTime = new DateTime(today.Year, today.Month, today.Day, 09, 0, 0);
+                        string strNow = today.ToString("yyyy년 MM월 dd일");
+                        string strDay = today.ToString("yyyy-MM-dd");
+                        this.myTelegramBot.sendTextMessageAsyncToBot(
+                            $"✔️ {strNow} 유통주식대비 거래량 비율 업데이트가 완료되었습니다." +
+                            $"오늘 하루도 수고많으셨습니다." +
+                            $"http://221.140.88.147:13000/analyze/volume/"+strDay);
+                        break;
                     }
                 }
             }));
 
-            t1.Start();
+            t2.Start();
 
         }
 
@@ -146,47 +170,6 @@ namespace CloudRealtime.RealCondition.handler
                     this.conditionList.Add(new Condition(int.Parse(condition[0]), condition[1]));
                 }
             }
-
-            //TODO.test 후에 주석 풀기
-            //Thread t1 = new Thread(new ThreadStart(() =>
-            //{
-            //    Logger.Info("유통거래량 쓰레드 시작");
-            //    TimeSpan triggerTime = new TimeSpan(15, 40, 0);
-            //    while (true)
-            //    {
-            //        TimeSpan timeNow = DateTime.Now.TimeOfDay;
-
-            //        if (timeNow > triggerTime)
-            //        {
-            //            //Thread.Sleep(180000);
-            //            sendCondition("3000","유통거래량_코스피", true);
-            //            break;
-            //        }
-            //    }
-            //}));
-
-            //t1.Start();
-
-            //Thread t2 = new Thread(new ThreadStart(() =>
-            //{
-            //    Logger.Info("유통거래량 쓰레드 시작");
-            //    TimeSpan triggerTime = new TimeSpan(15, 40, 0);
-            //    while (true)
-            //    {
-            //        TimeSpan timeNow = DateTime.Now.TimeOfDay;
-
-            //        if (timeNow > triggerTime)
-            //        {
-            //            sendCondition("3001", "유통거래량_코스닥", true);
-            //            break;
-            //        }
-            //    }
-            //}));
-
-            //t2.Start();
-
-            //sendCondition("3000", "유통거래량", false);
-            //sendCondition("3001","유통거래량_코스닥", false);
         }
 
         public void sendCondition(string screenNumber, string conditionName, bool isRealTime)
