@@ -94,7 +94,7 @@ namespace CloudRealtime.RealCondition.handler
                         string strDay = today.ToString("yyyy-MM-dd");
                         this.myTelegramBot.sendTextMessageAsyncToBot(
                             $"✔️ {strNow} 유통주식대비 거래량 비율 업데이트가 완료되었습니다." +
-                            $"오늘 하루도 수고많으셨습니다." +
+                            $"오늘 하루도 수고많으셨습니다. \n" +
                             $"http://221.140.88.147:13000/analyze/volume/"+strDay);
                         break;
                     }

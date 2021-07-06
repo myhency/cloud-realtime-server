@@ -75,7 +75,8 @@ namespace CloudRealtime.RealTime.handler
                 Alarm alarm = this.alarmList.FirstOrDefault(v => v.itemCode.Equals(e.sRealKey));
 
                 if(presentPrice >= alarm.recommendPrice 
-                    && alarm.alarmStatus.Equals("ALARM_CREATED")) //돌파가격보다 같거나 큰 경우
+                    && (alarm.alarmStatus.Equals("ALARM_CREATED") 
+                    || alarm.alarmStatus.Equals("PRICE_UPDATED"))) //돌파가격보다 같거나 큰 경우
                 {
                     //COMPLETE. alarmList에서 해당종목을 제거하지 않는다. 손절가격이 올 경우 알람을 줘야 한다.
                     //대신 알람의 상태를 변경하고 다시 alarmList에 넣어야 한다.
@@ -101,7 +102,8 @@ namespace CloudRealtime.RealTime.handler
                 }
 
                 if (presentPrice <= alarm.losscutPrice 
-                    && alarm.alarmStatus.Equals("ALARMED")) //손절가격보다 작거나 같은경우
+                    && (alarm.alarmStatus.Equals("ALARMED")
+                    || alarm.alarmStatus.Equals("PRICE_UPDATED"))) //손절가격보다 작거나 같은경우
                 {
                     //COMPLETE. alarmList에서 해당종목을 제거한다.
                     alarmList.Remove(alarm);
