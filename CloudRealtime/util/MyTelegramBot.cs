@@ -94,9 +94,9 @@ namespace CloudRealtime.util
             }
         }
 
-        public void sendTextMessageAsyncToBot(string alarmMessage)
+        public async void sendTextMessageAsyncToBot(string alarmMessage)
         {
-            bot.SendTextMessageAsync(long.Parse(this.userId), alarmMessage, parseMode: ParseMode.Markdown);
+            await bot.SendTextMessageAsync(long.Parse(this.userId), alarmMessage, parseMode: ParseMode.Markdown);
         }
 
         public void sendFileAsyncToBot(string path)

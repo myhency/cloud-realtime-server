@@ -73,17 +73,24 @@ namespace CloudRealtime.RealTime.controller
                         try
                         {
                             var cr = c.Consume(cts.Token);
-                            // 여기서 setRealReg 에 등록해 줘야 함.
+                            // 카프카에 새로 등록된 알림
                             Alarm item = JsonConvert.DeserializeObject<Alarm>(cr.Message.Value);
                             Alarm alarm = this.alarmList.FirstOrDefault(v => v.itemCode.Equals(item.itemCode));
-                            if(alarm is null)
+                            if (item.alarmStatus.Equals("DELETED"))
+                            {
+                                this.alarmList.Remove(alarm);
+                                realDataEventHandler.setAlarmList(this.alarmList);
+                                Logger.Info($"{item.itemName}({item.itemCode}) 종목이 삭제되었습니다.");
+                                goto End;
+                            }
+                            if (alarm is null) //새로등록하는 알림은 기존 알림리스트에 없다
                             {
                                 realDataEventHandler.setRealReg("2000", item.itemCode, "20;10;11;12;15;13;14;16;17;18;30", "1");
                                 this.alarmList.Add(item);
                                 realDataEventHandler.setAlarmList(this.alarmList);
                                 Logger.Info($"{item.itemName}({item.itemCode}) 종목이 등록되었습니다.");
                             }
-                            else
+                            else //기존 알람을 수정하는 경우
                             {
                                 //this.alarmList.Where(v => v.recommendPrice)
                                 alarm.losscutPrice = item.losscutPrice;
@@ -91,6 +98,9 @@ namespace CloudRealtime.RealTime.controller
                                 realDataEventHandler.setAlarmList(this.alarmList);
                                 Logger.Info($"{item.itemName}({item.itemCode}) 종목이 변경되었습니다.");
                             }
+
+                            End:
+                            Console.WriteLine("End");
                             
                         }
                         catch (ConsumeException e)

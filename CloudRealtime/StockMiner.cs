@@ -13,6 +13,7 @@ using CloudRealtime.KiwoomAPI;
 using CloudRealtime.RealCondition.controller;
 using CloudRealtime.RealTime.controller;
 using CloudRealtime.RealTime.model;
+using CloudRealtime.StockItem.controller;
 using CloudRealtime.util;
 using NLog;
 
@@ -28,6 +29,7 @@ namespace CloudRealtime
         private OtherFunctions otherFunctions;
         private RealTimeController realTimeController;
         private RealConditionController realConditionController;
+        private StockItemController stockItemController;
         private static DateTime today = DateTime.Now;
         private string strNow = today.ToString("yyyy-MM-dd");
 
@@ -79,6 +81,9 @@ namespace CloudRealtime
 
                 //기타함수 초기화
                 otherFunctions = new OtherFunctions(axKHOpenAPI1);
+
+                //전체종목리스트 초기화
+                stockItemController = new StockItemController(axKHOpenAPI1);
 
                 //가격수집 서비스 초기화
                 realTimeController = new RealTimeController(axKHOpenAPI1);

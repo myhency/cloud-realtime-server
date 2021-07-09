@@ -32,9 +32,9 @@ namespace CloudRealtime.RealCondition.service
             request.AddHeader("Content-Type", "application/json");
             var body = @"{
             " + "\n" +
-            @"    ""userName"": ""cloud"",
+            @"    ""userName"": ""admin"",
             " + "\n" +
-            @"    ""password"": ""1234""
+            @"    ""password"": ""admin1234admin""
             " + "\n" +
             @"}";
             request.AddParameter("application/json", body, ParameterType.RequestBody);
