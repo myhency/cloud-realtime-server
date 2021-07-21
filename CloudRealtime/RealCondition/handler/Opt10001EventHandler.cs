@@ -57,7 +57,7 @@ namespace CloudRealtime.RealCondition.handler
         private void axKHOpenAPI1_OnReceiveTrData(object sender, AxKHOpenAPILib._DKHOpenAPIEvents_OnReceiveTrDataEvent e)
         {
             logger.Debug("axKHOpenAPI1_OnReceiveTrData");
-            if (e.sRQName.Contains("주식기본정보요청_"))
+            if (e.sRQName.Contains("주식기본정보요청_유통거래량_"))
             {
                 Opt10001VO opt10001VO = getOpt10001VO(e.sTrCode, e.sRQName);
                 logger.Debug(e.sTrCode);
@@ -72,49 +72,27 @@ namespace CloudRealtime.RealCondition.handler
                 }
 
                 stockItemService.createVolume(opt10001VO);
+            }
+            else if(e.sRQName.Contains("주식기본정보요청_빵셔틀종목"))
+            {
+                Opt10001VO opt10001VO = getOpt10001VO(e.sTrCode, e.sRQName);
 
-                //DateTime today = DateTime.Now;
-                //DateTime startMarketTime = new DateTime(today.Year, today.Month, today.Day);
-                //string strNow = today.ToString("yyyy-MM-dd");
+                string message = $"🚍 빵셔틀 포착 알림 🚍\n" +
+                        $"\n" +
+                        $"종목명 : {opt10001VO.종목명} \n" +
+                        $"현재가 : {String.Format("{0:#,###}", opt10001VO.현재가)} ({opt10001VO.등락율}%)\n" +
+                        $"거래량 : {String.Format("{0:#,###}", opt10001VO.거래량)} \n" +
+                        $"유통주식대비거래량 : {Math.Round(((double.Parse(opt10001VO.거래량.ToString()) / (double.Parse(opt10001VO.유통주식.ToString()) * 1000)) * 100 * 100)/100)}% \n" +
+                        "차트보기 \n" +
+                        "https://m.alphasquare.co.kr/service/chart?code=" + opt10001VO.종목코드 + "\n" +
+                        "종목정보(알파스퀘어) \n" +
+                        "https://alphasquare.co.kr/home/stock/stock-summary?code=" + opt10001VO.종목코드 + "\n" +
+                        "종목정보(네이버) \n" +
+                        "https://finance.naver.com/item/main.nhn?code=" + opt10001VO.종목코드;
 
+                logger.Info(message);
 
-
-                //string theme = stockItemService.getTheme(opt10001VO.종목코드);
-                //string theme = "ffff";
-                //Thread.Sleep(1000);
-
-                //string conditionName = e.sRQName.Split('_')[2];
-                //int totalCount = int.Parse(e.sRQName.Split('_')[1]);
-                //this.path = conditionName.Contains("코스피") ? $"{AppDomain.CurrentDomain.BaseDirectory}\\admin\\{strNow}_코스피.csv" : $"{AppDomain.CurrentDomain.BaseDirectory}\\admin\\{strNow}_코스닥.csv";
-                //var csv = new StringBuilder();
-                //float 거래량대비유통주식비율 = float.Parse(opt10001VO.거래량.ToString()) / (float.Parse(opt10001VO.유통주식.ToString()) * 1000) * 100;
-                //var newLine = $"{opt10001VO.종목명}|{opt10001VO.현재가}원|{opt10001VO.등락율}%|" +
-                //    $"{opt10001VO.거래량}|{Math.Round(거래량대비유통주식비율,2)}%|" +
-                //    $"{opt10001VO.시가총액}억|{theme}";
-
-                //if (!File.Exists(this.path))
-                //{
-                //    FileStream f = File.Create(this.path);
-                //    f.Close();
-                //    logger.Info($"File Created!! {this.path}");
-                //    var header = "종목명|현재가|등락율|거래량|유통주식|시가총액|테마";
-                //    csv.AppendLine(header);
-                //}
-
-                //csv.AppendLine(newLine);
-                //File.AppendAllText(this.path, csv.ToString());
-
-                //this.itemList.Add(e.sTrCode);
-
-                //logger.Info("this.itemList.Count:"+this.itemList.Count);
-                //logger.Info("totalCount:" + totalCount);
-                //if (totalCount == 1)
-                //{
-                //    sendFileAsyncToBot();
-                //    myTelegramBot.sendTextMessageAsyncToBot($"🤑 {strNow} 클라우드의 주식 훈련소알리미 출발합니다 🤑");
-                //}
-                // TODO. To be removed
-                //googleSheet.updateCodeListToGoogleSheet(opt10001VO, conditionName);
+                myTelegramBot.sendTextMessageAsyncToSwingBot(message);
             }
         }
 

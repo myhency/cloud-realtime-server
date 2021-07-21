@@ -86,18 +86,36 @@ namespace CloudRealtime.RealTime.handler
                     Logger.Info($"{alarm.itemName} 종목 알림상태 변경됨 ==> {alarm.alarmStatus}");
 
                     //COMPLETE. 알람을 전송한다.
-                    string message = $"📈 *가격돌파 알림* \n" +
+                    // TODO. markdown 형태로 전송할때 오류가 발생하여 메세지 포맷을 변경함(7/14)
+                    //string message = $"📈 *가격돌파 알림* \n" +
+                    //    $"\n" +
+                    //    $"종목명 : *{alarm.itemName}* \n" +
+                    //    $"기준가격 {String.Format("{0:#,###}", alarm.recommendPrice)}원을 돌파했습니다. \n" +
+                    //    $"손절가격 {String.Format("{0:#,###}", alarm.losscutPrice)}원을 손절가격으로 설정하세요. \n" +
+                    //    $"현재가 : *{String.Format("{0:#,###}", presentPrice)}* ({fluctuationRate}%)\n" +
+                    //    $"\n" +
+                    //    $"{alarm.comment} \n" +
+                    //    $"\n" +
+                    //    $"{alarm.theme} \n" +
+                    //    $"\n" +
+                    //    $"https://m.alphasquare.co.kr/service/chart?code=" + alarm.itemCode;
+
+                    string message = $"📈 가격돌파 알림 \n" +
                         $"\n" +
-                        $"종목명 : *{alarm.itemName}* \n" +
+                        $"종목명 : {alarm.itemName} \n" +
                         $"기준가격 {String.Format("{0:#,###}", alarm.recommendPrice)}원을 돌파했습니다. \n" +
-                        $"손절가격 {String.Format("{0:#,###}", alarm.losscutPrice)}원을 손절가격으로 설정하세요. \n" +
-                        $"현재가 : *{String.Format("{0:#,###}", presentPrice)}* ({fluctuationRate}%)\n" +
+                        $"손절가격 {String.Format("{0:#,###}", alarm.losscutPrice)}원을 설정하세요. \n" +
+                        $"현재가 : {String.Format("{0:#,###}", presentPrice)} ({fluctuationRate}%)\n" +
                         $"\n" +
                         $"{alarm.comment} \n" +
                         $"\n" +
                         $"{alarm.theme} \n" +
                         $"\n" +
                         $"https://m.alphasquare.co.kr/service/chart?code=" + alarm.itemCode;
+
+                    Logger.Info(message);
+                    
+                    // TODO. try/catch 로 감쌀 것
                     iRealTimeController.sendTextMessageAsyncToBot(message);
 
                     //알리미 서버에 알람상태를 업데이트 한다.
@@ -114,23 +132,44 @@ namespace CloudRealtime.RealTime.handler
                     Logger.Info($"{alarm.itemName} 종목 삭제됨");
 
                     //COMPLETE. 알람을 전송한다.
-                    string message = $"📉 *가격이탈 알림* \n" +
+                    // TODO. markdown 형태로 전송할때 오류가 발생하여 메세지 포맷을 변경함(7/14)
+                    //string message = $"📉 *가격이탈 알림* \n" +
+                    //    $"\n" +
+                    //    $"종목명 : *{alarm.itemName}* \n" +
+                    //    $"기준가격 {String.Format("{0:#,###}", alarm.losscutPrice)}원을 이탈했습니다. \n" +
+                    //    $"현재가 : *{String.Format("{0:#,###}", presentPrice)}* ({fluctuationRate}%)\n" +
+                    //    $"\n" +
+                    //    $"{alarm.comment} \n" +
+                    //    $"\n" +
+                    //    $"{alarm.theme} \n" + 
+                    //    $"\n" +
+                    //    $"https://m.alphasquare.co.kr/service/chart?code=" + alarm.itemCode;
+
+                    string message = $"📉 가격이탈 알림 \n" +
                         $"\n" +
-                        $"종목명 : *{alarm.itemName}* \n" +
+                        $"종목명 : {alarm.itemName} \n" +
                         $"기준가격 {String.Format("{0:#,###}", alarm.losscutPrice)}원을 이탈했습니다. \n" +
-                        $"현재가 : *{String.Format("{0:#,###}", presentPrice)}* ({fluctuationRate}%)\n" +
+                        $"현재가 : {String.Format("{0:#,###}", presentPrice)} ({fluctuationRate}%)\n" +
                         $"\n" +
                         $"{alarm.comment} \n" +
                         $"\n" +
-                        $"{alarm.theme} \n" + 
+                        $"{alarm.theme} \n" +
                         $"\n" +
                         $"https://m.alphasquare.co.kr/service/chart?code=" + alarm.itemCode;
+
+                    Logger.Info(message);
+
+                    // TODO. try/catch 로 감쌀 것
                     iRealTimeController.sendTextMessageAsyncToBot(message);
 
                     //알리미 서버에 알람상태를 업데이트 한다.
                     alarmService.losscutAlarm(alarm.alarmId);
                 }
             }
+
+            //TODO. 007빵 리스트에서 가져온 종목 처리할 로직 구현하기
+
+
         }
     }
 }

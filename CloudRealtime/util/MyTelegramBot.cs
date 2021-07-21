@@ -20,7 +20,9 @@ namespace CloudRealtime.util
         IniFile ini = new IniFile();
         private string telegramToken = "";
         private TelegramBotClient bot;
+        private TelegramBotClient swingbot;
         private string userId;
+        private string swingId;
 
         public MyTelegramBot()
         {
@@ -32,6 +34,7 @@ namespace CloudRealtime.util
             ini.Load(Application.StartupPath + "\\settings.ini");
             this.telegramToken = ini["Settings"]["Token"].ToString();
             this.userId = ini["Settings"]["UserId"].ToString();
+            this.swingId = ini["Settings"]["SwingId"].ToString();
 
             if (telegramToken.Equals("") || telegramToken == null)
             {
@@ -43,6 +46,9 @@ namespace CloudRealtime.util
                 bot = new TelegramBotClient(telegramToken);
                 bot.OnMessage += bot_OnMessage;
                 bot.StartReceiving();
+                swingbot = new TelegramBotClient(telegramToken);
+                swingbot.OnMessage += bot_OnMessage;
+                swingbot.StartReceiving();
             }
         }
 
@@ -96,7 +102,12 @@ namespace CloudRealtime.util
 
         public async void sendTextMessageAsyncToBot(string alarmMessage)
         {
-            await bot.SendTextMessageAsync(long.Parse(this.userId), alarmMessage, parseMode: ParseMode.Markdown);
+            await bot.SendTextMessageAsync(long.Parse(this.userId), alarmMessage);
+        }
+
+        public async void sendTextMessageAsyncToSwingBot(string alarmMessage)
+        {
+            await swingbot.SendTextMessageAsync(long.Parse(this.swingId), alarmMessage);
         }
 
         public void sendFileAsyncToBot(string path)

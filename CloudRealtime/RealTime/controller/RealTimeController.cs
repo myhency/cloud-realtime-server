@@ -33,8 +33,10 @@ namespace CloudRealtime.RealTime.controller
             this.alarmService = new AlarmService();
             this.myTelegramBot = new MyTelegramBot();
             //알리미서버에서 가져오는 알람리스트
-            //TODO. 실시간으로 입력되는 알람은 Kafka consumer가 가져오도록 구현해야 함.
+            //COMPLETE. 실시간으로 입력되는 알람은 Kafka consumer가 가져오도록 구현해야 함.
             this.alarmList = this.alarmService.getAlarmList();
+            //TODO. 007빵 리스트 가져오기 구현해야 함
+
             this.realDataEventHandler = new RealDataEventHandler(this, axKHOpenAPI, this.alarmList);
             this.myTelegramBot.sendTextMessageAsyncToBot($"🤑 {strNow} 클라우드의 주식 훈련소알리미 출발합니다 🤑");
             initialize();
@@ -130,6 +132,9 @@ namespace CloudRealtime.RealTime.controller
             }));
 
             t1.Start();
+
+            //TODO. 007빵 리스트 가져와서 실시간 리스트에 등록하기
+
         }
     }
 }

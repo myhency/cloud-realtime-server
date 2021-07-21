@@ -1,5 +1,8 @@
 ﻿using CloudRealtime.RealCondition.model;
 using CloudRealtime.util;
+using FireSharp.Config;
+using FireSharp.Interfaces;
+using FireSharp.Response;
 using NLog;
 using System;
 using System.Collections.Generic;
@@ -20,6 +23,9 @@ namespace CloudRealtime.RealCondition.handler
         private List<Condition> conditionList;
         private BindingList<string> stockItemList;
         string[] itemCodeList = { };
+        string[] breadShuttleItemCodeList = { };
+        private IFirebaseConfig config;
+        private IFirebaseClient client;
 
         public RealConditionEventHandler(AxKHOpenAPILib.AxKHOpenAPI axKHOpenAPI)
         {
@@ -32,11 +38,26 @@ namespace CloudRealtime.RealCondition.handler
 
         private void initialize()
         {
+            
+
             axKHOpenAPI1.OnReceiveConditionVer += axKHOpenAPI1_OnReceiveConditionVer;
             axKHOpenAPI1.OnReceiveTrCondition += axKHOpenAPI1_OnReceiveTrCondition;
             axKHOpenAPI1.OnReceiveRealCondition += axKHOpenAPI1_OnReceiveRealCondition;
             axKHOpenAPI1.OnReceiveTrData += axKHOpenAPI1_OnReceiveTrData;
             stockItemList.ListChanged += stockItemList_ListChanged;
+
+            config = new FirebaseConfig
+            {
+                AuthSecret= "mYXKscnYNaaHOfLp6Lgyo6xpZBQT1ZoA5N1iv5Vl",
+                BasePath= "https://bread-stock.firebaseio.com/"
+            };
+
+            client = new FireSharp.FirebaseClient(config);
+
+            if (client != null)
+            {
+                Logger.Info("Connected to firebase");
+            }
 
             /**
              * 사용자 조건검색식의 실행순서:
@@ -51,6 +72,9 @@ namespace CloudRealtime.RealCondition.handler
             this.conditionList = new List<Condition>(); //사용자 조건식 리스트
 
             // TODO.test 후에 주석 풀기
+            // t1과 t2의 용도:
+            //  - t1은 16:00가 되면 "유통거래량" 이라는 조건식을 검색해서 종목을 찾는다.
+            //  - t2는 t1이 종목을 다 찾으면 종목하나씩 tr 요청을 해서 종목정보를 받고 db에 업데이트 한다.
             Thread t1 = new Thread(new ThreadStart(() =>
             {
                 Logger.Info("유통거래량 전송 쓰레드 시작");
@@ -81,7 +105,7 @@ namespace CloudRealtime.RealCondition.handler
                         {
                             if (itemCode.Length > 0)
                             {
-                                opt10001EventHandler.requestTrOpt10001(itemCode, itemCodeList.Length.ToString());
+                                opt10001EventHandler.requestTrOpt10001(itemCode, $"유통거래량_{itemCodeList.Length.ToString()}");
                                 Thread.Sleep(1500);
                                 itemCodeList = itemCodeList.Where(v => v != itemCode).ToArray();
                             }
@@ -103,6 +127,25 @@ namespace CloudRealtime.RealCondition.handler
 
             t2.Start();
 
+            Thread t3 = new Thread(new ThreadStart(() =>
+            {
+                Logger.Info("빵셔틀 조건검색 쓰레드 시작");
+                TimeSpan triggerTime = new TimeSpan(08, 30, 0);
+                while (true)
+                {
+                    TimeSpan timeNow = DateTime.Now.TimeOfDay;
+
+                    if (timeNow > triggerTime)
+                    {
+                        Thread.Sleep(30000);
+                        sendCondition("3000", "오늘돈이몰린종목", true);
+                        break;
+                    }
+                }
+            }));
+
+            t3.Start();
+
         }
 
         private void stockItemList_ListChanged(object sender, ListChangedEventArgs e)
@@ -118,36 +161,140 @@ namespace CloudRealtime.RealCondition.handler
         private void axKHOpenAPI1_OnReceiveRealCondition(object sender, AxKHOpenAPILib._DKHOpenAPIEvents_OnReceiveRealConditionEvent e)
         {
             Logger.Debug("axKHOpenAPI1_OnReceiveRealCondition");
+            if (e.strType.Equals("I"))
+            {
+                //여기서 빵셔틀 조건식을 필터링 한다.
+                if (e.strConditionName.Equals("오늘돈이몰린종목"))
+                {
+                    string itemCode = e.sTrCode;
+                    string itemName = axKHOpenAPI1.GetMasterCodeName(itemCode);
+                    DateTime today = DateTime.Now;
+                    string strNow = today.ToString("yyyyMMddHmmss");
+                    string strToday = today.ToString("yyyyMMdd");
+                    string path = $"bread-test/shuttle/{itemCode}";
+
+                    // # shuttle_ref 는 실시간, today_ref는 오늘 검색된 종목 다 포함
+                    // 1. firebase db를 세팅
+                    // 2. firebase db shuttle_ref에 값을 넣는다.
+                    //     {
+                    //       "code": itemCode,
+                    //       "name": itemName,
+                    //       "updatetime": strNow
+                    //     }
+                    // 3. 최초등록시간이 있는지 확인해보고
+                    // 없으면 today_ref에 최초등록시간을 넣어주고 텔레그램 발송,
+                    // 있으면 today_ref에 updatetime을 strNow로 업데이트한다.
+
+                    //ref. https://www.tutorialspoint.com/how-to-run-multiple-async-tasks-and-waiting-for-them-all-to-complete-in-chash
+                    var t = Task.Run(async () => await selectDataFromFirebase(path));
+
+                    Task.WaitAll(t);
+
+                    if (t.Result == null)  //최초
+                    {
+                        var data = new BreadShuttleData
+                        {
+                            code = itemCode,
+                            name = itemName,
+                            updatetime = strNow,
+                            firsttime = strNow
+                        };
+
+                        Task.Run(async () => await insertDataToFirebase(path, data));
+                        Logger.Info($"[firebase] {itemName} 종목 최초 등록 완료");
+                    }
+                    else // 두 번째 부터
+                    {
+                        var data = new BreadShuttleData
+                        {
+                            code = itemCode,
+                            name = itemName,
+                            updatetime = strNow,
+                            firsttime = t.Result.firsttime
+                        };
+
+                        Task.Run(async () => await updateDataToFirebase(path, data));
+                        Logger.Info($"[firebase] {itemName} 종목 두 번째 등록 완료");
+                    }
+
+                    opt10001EventHandler.requestTrOpt10001(itemCode, "빵셔틀종목");
+                }
+            }
+            else
+            {
+                if (e.strConditionName.Equals("오늘돈이몰린종목"))
+                {
+                    string itemCode = e.sTrCode;
+                    string path = $"bread-test/shuttle/{itemCode}";
+                    //실시간 조건검색 에서 이탈하는 경우
+                    //firebase db의 shuttle_ref에서 해당코드를 지운다.
+                    deleteDataFromFirebase(path);
+                }
+            }
         }
 
         private void axKHOpenAPI1_OnReceiveTrCondition(object sender, AxKHOpenAPILib._DKHOpenAPIEvents_OnReceiveTrConditionEvent e)
         {
             Logger.Debug("axKHOpenAPI1_OnReceiveTrCondition");
-            Logger.Debug(e.strCodeList);
-            //string[] itemCodeList = e.strCodeList.TrimEnd(';').Split(';');
-            this.itemCodeList = e.strCodeList.TrimEnd(';').Split(';');
-            //List<string> itemList = new List<string>();
-            //foreach (string itemCode in itemCodeList)
+            if (e.strConditionName.Equals("유통거래량"))
+            {
+                Logger.Debug(e.strCodeList);
+                this.itemCodeList = e.strCodeList.TrimEnd(';').Split(';');
+            }
+
+            //TODO. 장끝나고 테스트할 때만 주석풀기
+            //if (e.strConditionName.Equals("오늘돈이몰린종목"))
             //{
-            //    if (itemCode.Length > 0)
+            //    Logger.Debug(e.strCodeList);
+            //    this.breadShuttleItemCodeList = e.strCodeList.TrimEnd(';').Split(';');
+            //    foreach (string itemCode in breadShuttleItemCodeList)
             //    {
-            //        this.stockItemList.Add(itemCode);
-            //        //itemList.Add(itemCode);
-            //        //this.opt10001EventHandler.requestTrOpt10001(itemCode, $"종목저장TR요청_{e.strConditionName}");
-            //        //this.axKHOpenAPI1.SetInputValue("종목코드", itemCode);
-            //        //int x = this.axKHOpenAPI1.CommRqData($"주식기본정보요청_{e.strConditionName}_{itemCode}", "opt10001", 0, "3000");
-            //        //Logger.Info($"CommRqData result: {x}");
+            //        if (itemCode.Length > 0)
+            //        {
+            //            DateTime today = DateTime.Now;
+            //            string strNow = today.ToString("yyyyMMddHmmss");
+            //            string strToday = today.ToString("yyyyMMdd");
+            //            string path = $"bread-test/shuttle/{itemCode}";
+            //            string itemName = axKHOpenAPI1.GetMasterCodeName(itemCode);
+
+            //            var t = Task.Run(async () => await selectDataFromFirebase(path));
+
+            //            Task.WaitAll(t);
+
+            //            if(t.Result == null)  //최초
+            //            {
+            //                var data = new BreadShuttleData
+            //                {
+            //                    code = itemCode,
+            //                    name = itemName,
+            //                    updatetime = strNow,
+            //                    firsttime = strNow
+            //                };
+
+            //                Task.Run(async () => await insertDataToFirebase(path, data));
+            //                Logger.Info($"[firebase] {itemName} 종목 최초 등록 완료");
+            //            }
+            //            else // 두 번째 부터
+            //            {
+            //                var data = new BreadShuttleData
+            //                {
+            //                    code = itemCode,
+            //                    name = itemName,
+            //                    updatetime = strNow,
+            //                    firsttime = t.Result.firsttime
+            //                };
+
+            //                Task.Run(async () => await updateDataToFirebase(path, data));
+            //                Logger.Info($"[firebase] {itemName} 종목 두 번째 등록 완료");
+            //            }
+
+            //            myTelegramBot.sendTextMessageAsyncToSwingBot(
+            //                $"빵셔틀 종목 실시간 알림 \n" +
+            //                $"✅ {itemName}"
+            //            );
+            //        }
             //    }
-
-            //    Thread.Sleep(1500);
-            //    //break;
             //}
-
-            //this.opt10001EventHandler = new Opt10001EventHandler(this.axKHOpenAPI1, itemList);
-
-            //Thread.Sleep(10000);
-
-            //this.opt10001EventHandler.sendFileAsyncToBot();
         }
 
         private void axKHOpenAPI1_OnReceiveConditionVer(object sender, AxKHOpenAPILib._DKHOpenAPIEvents_OnReceiveConditionVerEvent e)
@@ -189,6 +336,31 @@ namespace CloudRealtime.RealCondition.handler
                     break;
                 }
             }
+        }
+
+        public async Task<BreadShuttleData> insertDataToFirebase(string path, BreadShuttleData data)
+        {
+            SetResponse response = await client.SetAsync(path, data);
+            Logger.Info($"[firebase] Success to insert data:{response.ResultAs<BreadShuttleData>().name}");
+            return response.ResultAs<BreadShuttleData>();
+        }
+
+        public async Task<BreadShuttleData> selectDataFromFirebase(string path)
+        {
+            FirebaseResponse response = await client.GetAsync(path);
+            return response.ResultAs<BreadShuttleData>();
+        }
+
+        public async Task updateDataToFirebase(string path, BreadShuttleData data)
+        {
+            FirebaseResponse response = await client.UpdateAsync(path, data);
+            Logger.Info($"[firebase] Success to update data:{response.ResultAs<BreadShuttleData>().name}");
+        }
+
+        public async void deleteDataFromFirebase(string path)
+        {
+            FirebaseResponse response = await client.DeleteAsync(path);
+            Logger.Info($"[firebase] Success to delete data:{path} --> {response.StatusCode}");
         }
     }
 }
