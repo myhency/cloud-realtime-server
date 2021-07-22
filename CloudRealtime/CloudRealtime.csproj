@@ -254,9 +254,12 @@
     <Compile Include="model\RealtimeStockSigningData.cs" />
     <Compile Include="RealTime\controller\IRealTimeController.cs" />
     <Compile Include="RealTime\controller\RealTimeController.cs" />
+    <Compile Include="RealTime\handler\Opt10001EventHandler.cs" />
     <Compile Include="RealTime\handler\RealDataEventHandler.cs" />
     <Compile Include="RealTime\model\Alarm.cs" />
+    <Compile Include="RealTime\model\SevenBreadItem.cs" />
     <Compile Include="RealTime\service\AlarmService.cs" />
+    <Compile Include="RealTime\service\SevenBreadService.cs" />
     <Compile Include="Settings.cs" />
     <Compile Include="StockItem\controller\StockItemController.cs" />
     <Compile Include="StockItem\model\Item.cs" />
