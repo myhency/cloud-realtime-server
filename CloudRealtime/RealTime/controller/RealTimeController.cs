@@ -40,11 +40,11 @@ namespace CloudRealtime.RealTime.controller
             //알리미서버에서 가져오는 알람리스트
             //COMPLETE. 실시간으로 입력되는 알람은 Kafka consumer가 가져오도록 구현해야 함.
             this.alarmList = this.alarmService.getAlarmList();
-            //TODO. 007빵 리스트 가져오기 구현해야 함
+            //COMPLETE. 007빵 리스트 가져오기 구현해야 함
             this.sevenBreadItemList = this.sevenBreadService.getSevenBreadItemList();
             this.realDataEventHandler = new RealDataEventHandler(this, axKHOpenAPI, this.alarmList, this.sevenBreadItemList);
-            
-            this.myTelegramBot.sendTextMessageAsyncToBot($"🤑 {strNow} 클라우드의 주식 훈련소알리미 출발합니다 🤑");
+
+            //this.myTelegramBot.sendTextMessageAsyncToBot($"🤑 {strNow} 클라우드의 주식 훈련소알리미 출발합니다 🤑");
             initialize();
         }
 
@@ -153,7 +153,6 @@ namespace CloudRealtime.RealTime.controller
                         {
                             var cr = c.Consume(cts.Token);
                             // 카프카에 새로 등록된 알림
-                            //Alarm item = JsonConvert.DeserializeObject<Alarm>(cr.Message.Value);
                             Logger.Info(cr.Message.Value);
                             opt10001EventHandler.requestTrOpt10001(cr.Message.Value, $"007빵");
                             Thread.Sleep(1500);
@@ -174,7 +173,7 @@ namespace CloudRealtime.RealTime.controller
 
         private void initialize()
         {
-            Logger.Info("=====알리미리스트 종목 등록 중...");
+            Logger.Info("===== 알리미리스트 종목 등록 중...");
             foreach (Alarm item in this.alarmList)
             {
                 Logger.Info($"{item.itemName}({item.itemCode}) 종목이 등록되었습니다.");
@@ -182,12 +181,23 @@ namespace CloudRealtime.RealTime.controller
             }
 
             //TODO. 007빵 리스트 가져와서 실시간 리스트에 등록하기
-            Logger.Info("=====007빵리스트 종목 등록 중...");
-            foreach (SevenBreadItem item in this.sevenBreadItemList)
+            Logger.Info("===== 007빵리스트 종목 등록 중...");
+            try
             {
-                Logger.Info($"{item.itemName}({item.itemCode}) 종목이 등록되었습니다.");
-                this.realDataEventHandler.setRealReg("7000", item.itemCode, "20;10;11;12;15;13;14;16;17;18;30", "1");
+                if (this.sevenBreadItemList == null) goto point;
+                foreach (SevenBreadItem item in this.sevenBreadItemList)
+                {
+                    Logger.Info($"{item.itemName}({item.itemCode}) 종목이 등록되었습니다. 기준가격 : {item.capturedPrice} 원");
+                    this.realDataEventHandler.setRealReg("7000", item.itemCode, "20;10;11;12;15;13;14;16;17;18;30", "1");
+                }
             }
+            catch (Exception e)
+            {
+                Logger.Error(e.Message);
+            }
+
+            point:;
+
 
             Thread t1 = new Thread(new ThreadStart(() =>
             {
@@ -214,14 +224,25 @@ namespace CloudRealtime.RealTime.controller
 
                     if (timeNow > triggerTime)
                     {
-                        foreach (SevenBreadItem item in this.sevenBreadItemList)
+                        try
                         {
-                            opt10001EventHandler.requestTrOpt10001(item.itemCode, $"007빵종가업데이트_{item.itemCode}");
-                            Thread.Sleep(1500);
+                            foreach (SevenBreadItem item in this.sevenBreadItemList)
+                            {
+                                opt10001EventHandler.requestTrOpt10001(item.itemCode, $"007빵종가업데이트_{item.itemName}");
+                                Thread.Sleep(1500);
+                            }
+
+                            break;
+                        }
+                        catch (Exception e)
+                        {
+                            Logger.Error(e.Message);
                         }
                     }
                 }
             }));
+
+            t3.Start();
         }
     }
 }

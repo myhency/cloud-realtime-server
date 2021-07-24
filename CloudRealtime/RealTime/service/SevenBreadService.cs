@@ -6,6 +6,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace CloudRealtime.RealTime.service
@@ -62,7 +63,7 @@ namespace CloudRealtime.RealTime.service
             request = new RestRequest(Method.GET);
             request.AddParameter("Authorization", "Bearer " + this.token, ParameterType.HttpHeader);
 
-            response = client.Execute(request);
+            response = client.Execute<List<SevenBreadItem>>(request);
 
             if (response.StatusCode != System.Net.HttpStatusCode.OK)
             {
@@ -76,19 +77,28 @@ namespace CloudRealtime.RealTime.service
 
                 List<SevenBreadItem> sevenBreadItemList = new List<SevenBreadItem>();
 
+               
                 foreach (JObject item in jArray)
                 {
-                    sevenBreadItemList.Add(new SevenBreadItem()
+                    try
                     {
-                        id = long.Parse(item.GetValue("id").ToString()),
-                        itemCode = item.GetValue("itemCode").ToString(),
-                        itemName = item.GetValue("itemName").ToString(),
-                        //capturedPrice = int.Parse(item.GetValue("capturedPrice").ToString()),
-                        capturedDate = item.GetValue("capturedDate").ToString(),
-                        majorHandler = item.GetValue("majorHandler").ToString(),
-                    });
+                        sevenBreadItemList.Add(new SevenBreadItem()
+                        {
+                            id = long.Parse(item.GetValue("id").ToString()),
+                            itemCode = item.GetValue("itemCode").ToString(),
+                            itemName = item.GetValue("itemName").ToString(),
+                            capturedPrice = item.GetValue("capturedPrice") == null ? 0 : int.Parse(item.GetValue("capturedPrice").ToString()),
+                            capturedDate = item.GetValue("capturedDate").ToString(),
+                            majorHandler = item.GetValue("majorHandler").ToString(),
+                            theme = item.GetValue("theme").ToString(),
+                        });
+                    } catch (Exception e)
+                    {
+                        Logger.Error($"[get sevenBread list]{e.Message}");
+                    }
+                        
                 }
-
+                
                 return sevenBreadItemList;
             }
         }

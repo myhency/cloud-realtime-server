@@ -24,7 +24,7 @@ namespace CloudRealtime.RealTime.handler
         private IFirebaseClient client;
 
         private List<Alarm> alarmList;
-        private List<SevenBreadItem> sevenBreadItemList;
+        private List<SevenBreadItem> sevenBreadItemList = new List<SevenBreadItem>();
         bool isMarketOpen = false;
 
         public RealDataEventHandler(
@@ -39,7 +39,25 @@ namespace CloudRealtime.RealTime.handler
             this.alarmService = new AlarmService();
             this.sevenBreadService = new SevenBreadService();
             this.alarmList = alarmList;
-            this.sevenBreadItemList = sevenBreadItemList;
+            //Note. 여기서 sevenBreadItemList 를 deep copy 해주어야 함.
+            //      그렇지 않으면 알람을 주고 list 에서 종목을 삭제할 때
+            //      RealTimeController 에서 System.InvalidOperationException 이 발생함.
+            //      그래서 선언도 sevenBreadItemList = new List<SevenBreadItem>(); 이렇게 해 줌.
+            try
+            {
+                if (sevenBreadItemList == null) goto point;
+                foreach (SevenBreadItem item in sevenBreadItemList)
+                {
+                    this.sevenBreadItemList.Add(item);
+                }
+            }
+            catch (Exception e)
+            {
+                Logger.Error($"[get sevenBread list]{e.Message}");
+            }
+
+            point:;
+            
             initialize();
         }
 
@@ -182,7 +200,9 @@ namespace CloudRealtime.RealTime.handler
 
                 SevenBreadItem sevenBreadItem = this.sevenBreadItemList.FirstOrDefault(v => v.itemCode.Equals(e.sRealKey));
 
-                if(presentPrice > sevenBreadItem.capturedPrice)
+                //어제 종가가 기준가보다 낮은 종목이 현재가가 기준가보다 올라갈 때 알림을 준다
+                if (presentPrice > sevenBreadItem.capturedPrice 
+                    && sevenBreadItem.closingPrice < sevenBreadItem.capturedPrice)
                 {
                     Logger.Info($"{sevenBreadItem.itemName} 종목 기준가 돌파 알림");
                     this.sevenBreadItemList.Remove(sevenBreadItem);
@@ -206,6 +226,32 @@ namespace CloudRealtime.RealTime.handler
 
                     insertIntoFireBase(sevenBreadItem, presentPrice, fluctuationRate);
                 }
+                //어제 종가가 기준가보다 높은 종목이 현재가가 기준가보다 내려갈 때 알림을 준다
+                else if (presentPrice < sevenBreadItem.capturedPrice
+                    && sevenBreadItem.closingPrice > sevenBreadItem.capturedPrice)
+                {
+                    Logger.Info($"{sevenBreadItem.itemName} 종목 기준가 이탈 알림");
+                    this.sevenBreadItemList.Remove(sevenBreadItem);
+
+                    string message = $"📉 007빵 종목 기준가격 이탈 알림 \n" +
+                        $"\n" +
+                        $"해당알림은 테스트용 입니다. 매수전 훈련소에 문의바랍니다.\n" +
+                        $"\n" +
+                        $"종목명 : {sevenBreadItem.itemName} \n" +
+                        $"기준가격 {String.Format("{0:#,###}", sevenBreadItem.capturedPrice)}원을 이탈했습니다. \n" +
+                        $"현재가 : {String.Format("{0:#,###}", presentPrice)} ({fluctuationRate}%)\n" +
+                        $"편입일 : {sevenBreadItem.capturedDate} \n" +
+                        $"\n" +
+                        $"{sevenBreadItem.theme} \n" +
+                        $"\n" +
+                        $"https://m.alphasquare.co.kr/service/chart?code=" + sevenBreadItem.itemCode;
+
+                    Logger.Info(message);
+
+                    iRealTimeController.sendTextMessageAsyncToBot(message);
+
+                    insertIntoFireBase(sevenBreadItem, presentPrice, fluctuationRate);
+                }
             }
 
         }
@@ -215,9 +261,9 @@ namespace CloudRealtime.RealTime.handler
             string itemCode = sevenBreadItem.itemCode;
             string itemName = sevenBreadItem.itemName;
             DateTime today = DateTime.Now;
-            string strNow = today.ToString("yyyyMMddHmmss");
+            string strNow = today.ToString("HH:mm:ss");
             string strToday = today.ToString("yyyyMMdd");
-            string path = $"sevenbread-test/alarm/{itemCode}";
+            string path = $"sevenbread-test/alarm/{strToday}/{itemCode}";
 
             //var t = Task.Run(async () => await selectDataFromFirebase(path));
 
