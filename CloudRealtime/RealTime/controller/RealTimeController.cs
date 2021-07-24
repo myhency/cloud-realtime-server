@@ -44,7 +44,6 @@ namespace CloudRealtime.RealTime.controller
             this.sevenBreadItemList = this.sevenBreadService.getSevenBreadItemList();
             this.realDataEventHandler = new RealDataEventHandler(this, axKHOpenAPI, this.alarmList, this.sevenBreadItemList);
 
-            //this.myTelegramBot.sendTextMessageAsyncToBot($"🤑 {strNow} 클라우드의 주식 훈련소알리미 출발합니다 🤑");
             initialize();
         }
 

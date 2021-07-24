@@ -261,6 +261,11 @@
     <Compile Include="RealTime\service\AlarmService.cs" />
     <Compile Include="RealTime\service\SevenBreadService.cs" />
     <Compile Include="Settings.cs" />
+    <Compile Include="SevenBread\controller\SevenBreadController.cs" />
+    <Compile Include="SevenBread\handler\Opt10001EventHandler.cs" />
+    <Compile Include="SevenBread\handler\RealDataEventHandler.cs" />
+    <Compile Include="SevenBread\model\SevenBreadItem.cs" />
+    <Compile Include="SevenBread\service\SevenBreadService.cs" />
     <Compile Include="StockItem\controller\StockItemController.cs" />
     <Compile Include="StockItem\model\Item.cs" />
     <Compile Include="StockItem\service\StockItemService.cs" />

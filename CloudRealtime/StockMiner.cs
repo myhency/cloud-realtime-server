@@ -13,6 +13,7 @@ using CloudRealtime.KiwoomAPI;
 using CloudRealtime.RealCondition.controller;
 using CloudRealtime.RealTime.controller;
 using CloudRealtime.RealTime.model;
+using CloudRealtime.SevenBread.controller;
 using CloudRealtime.StockItem.controller;
 using CloudRealtime.util;
 using NLog;
@@ -30,6 +31,8 @@ namespace CloudRealtime
         private RealTimeController realTimeController;
         private RealConditionController realConditionController;
         private StockItemController stockItemController;
+        private MyTelegramBot myTelegramBot;
+        private SevenBreadController sevenBreadController;
         private static DateTime today = DateTime.Now;
         private string strNow = today.ToString("yyyy-MM-dd");
 
@@ -38,61 +41,53 @@ namespace CloudRealtime
             InitializeComponent();
 
             axKHOpenAPI1.OnEventConnect += axKHOpenAPI1_OnEventConnect;
-
-            //Console.WriteLine(AppDomain.CurrentDomain.BaseDirectory + "logs" + Path.DirectorySeparatorChar);
-            //var watcher = new FileSystemWatcher();
-            //watcher.Path = AppDomain.CurrentDomain.BaseDirectory + "logs";
-            //watcher.NotifyFilter = NotifyFilters.LastWrite;
-            //watcher.Filter = $"{strNow}.log";
-            //watcher.Changed += new FileSystemEventHandler(Changed);
-            //watcher.EnableRaisingEvents = true;
             login();
         }
-
-        //private void Changed(object sender, FileSystemEventArgs e)
-        //{   
-        //    var log = File.ReadLines(
-        //        AppDomain.CurrentDomain.BaseDirectory
-        //        + "logs"
-        //        + Path.DirectorySeparatorChar
-        //        + $"{strNow}.log",
-        //        System.Text.Encoding.GetEncoding(949)
-        //        )
-        //        .Last();
-        //    this.Invoke(new Action(delegate ()
-        //    {
-        //        logRichTextBox.AppendText(log + "\n");
-        //    }));
-        //}
 
         private void axKHOpenAPI1_OnEventConnect(object sender, AxKHOpenAPILib._DKHOpenAPIEvents_OnEventConnectEvent e)
         {
             if (e.nErrCode == 0) //로그인 성공시
             {
-                Logger.Debug("로그인성공");
-                //데일리종목정보 초기화
-                //dailyCrawler = new DailyCrawler(this, axKHOpenAPI1);
+                Logger.Info("키움API 로그인성공");
 
-                //알리미 초기화
-                //alrime = new Alrime(this, axKHOpenAPI1);
+                //텔레그램봇 초기화
+                this.myTelegramBot = new MyTelegramBot();
+                this.myTelegramBot.sendTextMessageAsyncToSwingBot("키움API 로그인성공");
+                //this.myTelegramBot.sendTextMessageAsyncToBot($"🤑 {strNow} 클라우드의 주식 훈련소알리미 출발합니다 🤑");
 
-                //TR 요청 이벤트 핸들러 초기화
-                //trEventHandler = new TrEventHandler(this, axKHOpenAPI1);
+                initializeSevenBreadService();
+                
 
-                //기타함수 초기화
-                otherFunctions = new OtherFunctions(axKHOpenAPI1);
+                ////기타함수 초기화
+                //otherFunctions = new OtherFunctions(axKHOpenAPI1);
 
-                //전체종목리스트 초기화
-                stockItemController = new StockItemController(axKHOpenAPI1);
+                ////전체종목리스트 초기화
+                //stockItemController = new StockItemController(axKHOpenAPI1);
 
-                //가격수집 서비스 초기화
-                realTimeController = new RealTimeController(axKHOpenAPI1);
+                ////가격수집 서비스 초기화
+                //realTimeController = new RealTimeController(axKHOpenAPI1);
 
-                //조건검색 서비스 초기화
-                realConditionController = new RealConditionController(axKHOpenAPI1);
+                ////조건검색 서비스 초기화
+                //realConditionController = new RealConditionController(axKHOpenAPI1);
 
-                //realConditionController.sendCondition("유통거래량_코스피", false);
-            }
+                ////realConditionController.sendCondition("유통거래량_코스피", false);
+            } 
+        }
+
+        private void initializeSevenBreadService()
+        {
+            //키움API 로그인에 성공했다면 007빵 등록종목이 있는지 확인
+            //if 007빵 등록종목이 있다면
+            //  종가를 포착일 종가를 업데이트
+            //007빵 종목이 등록되어 있는지를 확인하는 kafka consumer는 프로그램시작 시
+            //한 번만 확인을 한다.(종목 입력이 장 종료 후 또는 일요일 오후에 됨)
+            this.sevenBreadController = new SevenBreadController(axKHOpenAPI1);
+            //this.sevenBreadController.getNewSevenBreadItemClosingPriceUpdateThread().Start();
+            //여기서 약 1분간 쉬어간 후 다음 프로세스를 진행해야 한다.
+            
+            //this.sevenBreadController.stopNewSevenBreadItemClosingPriceUpdateThread();
+            //this.sevenBreadController.startSevenBreadRealTimeMonitoring();
+
         }
 
         private void login()
