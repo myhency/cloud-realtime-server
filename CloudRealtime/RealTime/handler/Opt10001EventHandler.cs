@@ -1,5 +1,6 @@
 ﻿using CloudRealtime.RealCondition.service;
 using CloudRealtime.RealTime.service;
+using CloudRealtime.SevenBread.service;
 using CloudRealtime.util;
 using NLog;
 using System;
@@ -10,13 +11,12 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace CloudRealtime.SevenBread.handler
+namespace CloudRealtime.RealTime.handler
 {
     public partial class Opt10001EventHandler
     {
         private static Logger logger = LogManager.GetCurrentClassLogger();
         private AxKHOpenAPILib.AxKHOpenAPI axKHOpenAPI1;
-        private StockItemService stockItemService;
         private SevenBreadService sevenBreadService;
         private OtherFunctions otherFunctions;
         private MyTelegramBot myTelegramBot;
@@ -26,7 +26,6 @@ namespace CloudRealtime.SevenBread.handler
         {
             this.axKHOpenAPI1 = axKHOpenAPI;
             this.myTelegramBot = new MyTelegramBot();
-            this.stockItemService = new StockItemService();
             this.sevenBreadService = new SevenBreadService();
             this.otherFunctions = new OtherFunctions(axKHOpenAPI);
             this.axKHOpenAPI1.OnReceiveTrData += axKHOpenAPI1_OnReceiveTrData;

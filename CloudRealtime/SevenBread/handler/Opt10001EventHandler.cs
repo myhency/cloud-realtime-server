@@ -1,5 +1,5 @@
-﻿using CloudRealtime.RealCondition.service;
-using CloudRealtime.RealTime.service;
+﻿using CloudRealtime.SevenBread.service;
+using CloudRealtime.StockItem.service;
 using CloudRealtime.util;
 using NLog;
 using System;
@@ -10,7 +10,7 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace CloudRealtime.RealTime.handler
+namespace CloudRealtime.SevenBread.handler
 {
     public partial class Opt10001EventHandler
     {

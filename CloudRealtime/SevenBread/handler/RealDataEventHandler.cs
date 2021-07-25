@@ -1,4 +1,4 @@
-﻿using CloudRealtime.RealTime.model;
+﻿using CloudRealtime.SevenBread.model;
 using CloudRealtime.util;
 using FireSharp.Config;
 using FireSharp.Interfaces;
@@ -119,8 +119,6 @@ namespace CloudRealtime.SevenBread.handler
 
                     string message = $"📈 007빵 종목 기준가격 돌파 알림 \n" +
                         $"\n" +
-                        $"해당알림은 테스트용 입니다. 매수전 훈련소에 문의바랍니다.\n" +
-                        $"\n" +
                         $"종목명 : {sevenBreadItem.itemName} \n" +
                         $"기준가격 {String.Format("{0:#,###}", sevenBreadItem.capturedPrice)}원을 돌파했습니다. \n" +
                         $"현재가 : {String.Format("{0:#,###}", presentPrice)} ({fluctuationRate}%)\n" +
@@ -132,7 +130,7 @@ namespace CloudRealtime.SevenBread.handler
 
                     Logger.Info(message);
 
-                    //iRealTimeController.sendTextMessageAsyncToBot(message);
+                    myTelegramBot.sendTextMessageAsyncToSwingBot(message);
 
                     insertIntoFireBase(sevenBreadItem, presentPrice, fluctuationRate);
                 }
@@ -145,8 +143,6 @@ namespace CloudRealtime.SevenBread.handler
 
                     string message = $"📉 007빵 종목 기준가격 이탈 알림 \n" +
                         $"\n" +
-                        $"해당알림은 테스트용 입니다. 매수전 훈련소에 문의바랍니다.\n" +
-                        $"\n" +
                         $"종목명 : {sevenBreadItem.itemName} \n" +
                         $"기준가격 {String.Format("{0:#,###}", sevenBreadItem.capturedPrice)}원을 이탈했습니다. \n" +
                         $"현재가 : {String.Format("{0:#,###}", presentPrice)} ({fluctuationRate}%)\n" +
@@ -158,7 +154,7 @@ namespace CloudRealtime.SevenBread.handler
 
                     Logger.Info(message);
 
-                    myTelegramBot.sendTextMessageAsyncToBot(message);
+                    myTelegramBot.sendTextMessageAsyncToSwingBot(message);
 
                     insertIntoFireBase(sevenBreadItem, presentPrice, fluctuationRate);
                 }

@@ -21,7 +21,6 @@ namespace CloudRealtime.RealCondition.handler
         private Opt10001EventHandler opt10001EventHandler;
         private MyTelegramBot myTelegramBot;
         private List<Condition> conditionList;
-        private BindingList<string> stockItemList;
         string[] itemCodeList = { };
         string[] breadShuttleItemCodeList = { };
         private IFirebaseConfig config;
@@ -32,7 +31,6 @@ namespace CloudRealtime.RealCondition.handler
             this.axKHOpenAPI1 = axKHOpenAPI;
             this.opt10001EventHandler = new Opt10001EventHandler(axKHOpenAPI);
             this.myTelegramBot = new MyTelegramBot();
-            this.stockItemList = new BindingList<string>();
             initialize();
         }
 
@@ -42,7 +40,6 @@ namespace CloudRealtime.RealCondition.handler
             axKHOpenAPI1.OnReceiveTrCondition += axKHOpenAPI1_OnReceiveTrCondition;
             axKHOpenAPI1.OnReceiveRealCondition += axKHOpenAPI1_OnReceiveRealCondition;
             axKHOpenAPI1.OnReceiveTrData += axKHOpenAPI1_OnReceiveTrData;
-            stockItemList.ListChanged += stockItemList_ListChanged;
 
             config = new FirebaseConfig
             {
@@ -144,11 +141,6 @@ namespace CloudRealtime.RealCondition.handler
 
             t3.Start();
 
-        }
-
-        private void stockItemList_ListChanged(object sender, ListChangedEventArgs e)
-        {
-            opt10001EventHandler.requestTrOpt10001(stockItemList.ElementAt(e.NewIndex), "유통");
         }
 
         private void axKHOpenAPI1_OnReceiveTrData(object sender, AxKHOpenAPILib._DKHOpenAPIEvents_OnReceiveTrDataEvent e)

@@ -1,5 +1,6 @@
 ﻿using CloudRealtime.StockItem.model;
 using CloudRealtime.StockItem.service;
+using CloudRealtime.util;
 using NLog;
 using System;
 using System.Collections.Generic;
@@ -15,12 +16,14 @@ namespace CloudRealtime.StockItem.controller
         private AxKHOpenAPILib.AxKHOpenAPI axKHOpenAPI1;
         private OtherFunctions otherFunctions;
         private StockItemService stockItemService;
+        private MyTelegramBot myTelegramBot;
 
         public StockItemController(AxKHOpenAPILib.AxKHOpenAPI axKHOpenAPI)
         {
             this.axKHOpenAPI1 = axKHOpenAPI;
             otherFunctions = new OtherFunctions(axKHOpenAPI1);
             this.stockItemService = new StockItemService();
+            this.myTelegramBot = new MyTelegramBot();
 
             initialize();
         }
@@ -98,7 +101,7 @@ namespace CloudRealtime.StockItem.controller
             }
 
             Logger.Info("전체 종목리스트 업데이트 완료");
-
+            this.myTelegramBot.sendTextMessageAsyncToSwingBot("[StockItems] 전체 종목리스트 업데이트 완료");
         }
     }
 }
