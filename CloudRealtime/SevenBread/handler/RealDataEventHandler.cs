@@ -20,6 +20,8 @@ namespace CloudRealtime.SevenBread.handler
         private MyTelegramBot myTelegramBot;
 
         private List<SevenBreadItem> sevenBreadItemList = new List<SevenBreadItem>();
+        private List<SevenBreadItem> realTimeSevenBreadItemList = new List<SevenBreadItem>();
+
         bool isMarketOpen = false;
 
         public RealDataEventHandler(
@@ -105,17 +107,25 @@ namespace CloudRealtime.SevenBread.handler
             //TODO. 007빵 리스트에서 가져온 종목 처리할 로직 구현하기
             if (e.sRealType.Equals("주식체결") && sevenBreadItemList.Exists(v => v.itemCode == e.sRealKey) && isMarketOpen)
             {
-                int presentPrice = Math.Abs(int.Parse(axKHOpenAPI1.GetCommRealData(e.sRealKey, 10))); //현재가
-                double fluctuationRate = double.Parse(axKHOpenAPI1.GetCommRealData(e.sRealKey, 12)); //등락율
-
                 SevenBreadItem sevenBreadItem = this.sevenBreadItemList.FirstOrDefault(v => v.itemCode.Equals(e.sRealKey));
 
+                int presentPrice = Math.Abs(int.Parse(axKHOpenAPI1.GetCommRealData(e.sRealKey, 10))); //현재가
+                double fluctuationRate = double.Parse(axKHOpenAPI1.GetCommRealData(e.sRealKey, 12)); //등락율
+                double fluctuationRateBy = 100 - Math.Round(double.Parse(sevenBreadItem.capturedPrice.ToString()) / double.Parse(presentPrice.ToString()) * 100, 2);
+
                 //어제 종가가 기준가보다 낮은 종목이 현재가가 기준가보다 올라갈 때 알림을 준다
+                //매수알림
                 if (presentPrice > sevenBreadItem.capturedPrice 
                     && sevenBreadItem.closingPrice < sevenBreadItem.capturedPrice)
                 {
                     Logger.Info($"{sevenBreadItem.itemName} 종목 기준가 돌파 알림");
                     this.sevenBreadItemList.Remove(sevenBreadItem);
+                    sevenBreadItem.alarmStatus = "UP";
+                    sevenBreadItem.presentPrice = presentPrice;
+                    sevenBreadItem.fluctuationRate = fluctuationRate;
+                    sevenBreadItem.fluctuationRateBy = fluctuationRateBy;
+
+                    this.realTimeSevenBreadItemList.Add(sevenBreadItem);
 
                     string message = $"📈 007빵 종목 기준가격 돌파 알림 \n" +
                         $"\n" +
@@ -132,14 +142,19 @@ namespace CloudRealtime.SevenBread.handler
 
                     myTelegramBot.sendTextMessageAsyncToSwingBot(message);
 
-                    insertIntoFireBase(sevenBreadItem, presentPrice, fluctuationRate);
+                    insertIntoFireBase(sevenBreadItem);
+
+                    
                 }
                 //어제 종가가 기준가보다 높은 종목이 현재가가 기준가보다 내려갈 때 알림을 준다
+                //손절알림
                 else if (presentPrice < sevenBreadItem.capturedPrice
                     && sevenBreadItem.closingPrice > sevenBreadItem.capturedPrice)
                 {
                     Logger.Info($"{sevenBreadItem.itemName} 종목 기준가 이탈 알림");
                     this.sevenBreadItemList.Remove(sevenBreadItem);
+
+                    sevenBreadItem.alarmStatus = "DOWN";
 
                     string message = $"📉 007빵 종목 기준가격 이탈 알림 \n" +
                         $"\n" +
@@ -156,44 +171,88 @@ namespace CloudRealtime.SevenBread.handler
 
                     myTelegramBot.sendTextMessageAsyncToSwingBot(message);
 
-                    insertIntoFireBase(sevenBreadItem, presentPrice, fluctuationRate);
+                    insertIntoFireBase(sevenBreadItem);
                 }
+
+                
+            }
+            //TODO. 007빵 알림이 나간 종목들에 대해 실시간 가격 감시 로직
+            else if(e.sRealType.Equals("주식체결") && realTimeSevenBreadItemList.Exists(v => v.itemCode == e.sRealKey) && isMarketOpen)
+            {
+                SevenBreadItem realTimeSevenBreadItem = this.realTimeSevenBreadItemList.FirstOrDefault(v => v.itemCode.Equals(e.sRealKey));
+
+                int presentPrice = Math.Abs(int.Parse(axKHOpenAPI1.GetCommRealData(e.sRealKey, 10))); //현재가
+                double fluctuationRate = double.Parse(axKHOpenAPI1.GetCommRealData(e.sRealKey, 12)); //등락율
+                double fluctuationRateBy = 100 - Math.Round(double.Parse(realTimeSevenBreadItem.capturedPrice.ToString()) / double.Parse(presentPrice.ToString()) * 100, 2);
+
+                realTimeSevenBreadItem.presentPrice = presentPrice;
+                realTimeSevenBreadItem.fluctuationRateBy = fluctuationRateBy;
+
+                updateToFireBase(realTimeSevenBreadItem);
+
+                Logger.Debug($"[007빵] 알림나간 종목 실시간 가격 변동: " +
+                    $"{realTimeSevenBreadItem.itemName}(기준가: {realTimeSevenBreadItem.capturedPrice}) " +
+                    $"=> 현재가: {presentPrice}, " +
+                    $"기준가대비 상승률: {(100 - Math.Round(double.Parse(realTimeSevenBreadItem.capturedPrice.ToString()) / double.Parse(presentPrice.ToString())) * 100, 2)}%");
             }
         }
 
-        private void insertIntoFireBase(SevenBreadItem sevenBreadItem, int presentPrice, double fluctuationRate)
+        private void insertIntoFireBase(SevenBreadItem sevenBreadItem)
         {
             string itemCode = sevenBreadItem.itemCode;
             string itemName = sevenBreadItem.itemName;
             DateTime today = DateTime.Now;
             string strNow = today.ToString("HH:mm:ss");
             string strToday = today.ToString("yyyyMMdd");
-            string path = $"sevenbread-test/alarm/{strToday}/{itemCode}";
-
-            //var t = Task.Run(async () => await selectDataFromFirebase(path));
-
-            //Task.WaitAll(t);
+            string path = $"sevenbread/alarm/{strToday}/{itemCode}";
 
             var data = new SevenBreadItem
             {
                 itemCode = itemCode,
                 itemName = itemName,
-                closingPrice = presentPrice,
+                closingPrice = sevenBreadItem.closingPrice,
                 capturedPrice = sevenBreadItem.capturedPrice,
                 capturedDate = sevenBreadItem.capturedDate,
-                fluctuationRate = fluctuationRate,
+                fluctuationRate = sevenBreadItem.fluctuationRate,
                 alarmedTime = strNow,
+                alarmStatus = sevenBreadItem.alarmStatus,
+                presentPrice = sevenBreadItem.presentPrice,
+                fluctuationRateBy = sevenBreadItem.fluctuationRateBy,
             };
 
-            Task.Run(async () => await insertDataToFirebase(path, data));
-            Logger.Info($"[firebase] {itemName} 007빵종목 알림데이터 등록 완료");
+            insertDataToFirebase(path, data);
         }
 
-        public async Task<SevenBreadItem> insertDataToFirebase(string path, SevenBreadItem data)
+        private void updateToFireBase(SevenBreadItem sevenBreadItem)
+        {
+            string itemCode = sevenBreadItem.itemCode;
+            string itemName = sevenBreadItem.itemName;
+            DateTime today = DateTime.Now;
+            string strNow = today.ToString("HH:mm:ss");
+            string strToday = today.ToString("yyyyMMdd");
+            string path = $"sevenbread/alarm/{strToday}/{itemCode}";
+
+            var data = new SevenBreadItem
+            {
+                itemCode = itemCode,
+                itemName = itemName,
+                closingPrice = sevenBreadItem.presentPrice,
+                capturedPrice = sevenBreadItem.capturedPrice,
+                capturedDate = sevenBreadItem.capturedDate,
+                fluctuationRate = sevenBreadItem.fluctuationRate,
+                alarmedTime = strNow,
+                alarmStatus = sevenBreadItem.alarmStatus,
+                presentPrice = sevenBreadItem.presentPrice,
+                fluctuationRateBy = sevenBreadItem.fluctuationRateBy,
+            };
+
+            updateDataToFirebase(path, data);
+        }
+
+        public async void insertDataToFirebase(string path, SevenBreadItem data)
         {
             SetResponse response = await client.SetAsync(path, data);
-            Logger.Info($"[firebase] Success to insert data:{response.ResultAs<SevenBreadItem>().itemName}");
-            return response.ResultAs<SevenBreadItem>();
+            Logger.Debug($"[007빵][firebase] 알림데이터 등록 완료:{response.ResultAs<SevenBreadItem>().itemName}");
         }
 
         public async Task<SevenBreadItem> selectDataFromFirebase(string path)
@@ -202,16 +261,19 @@ namespace CloudRealtime.SevenBread.handler
             return response.ResultAs<SevenBreadItem>();
         }
 
-        public async Task updateDataToFirebase(string path, SevenBreadItem data)
+        public async void updateDataToFirebase(string path, SevenBreadItem data)
         {
             FirebaseResponse response = await client.UpdateAsync(path, data);
-            Logger.Info($"[firebase] Success to update data:{response.ResultAs<SevenBreadItem>().itemName}");
+            Logger.Debug($"[firebase] Success to update data:{response.ResultAs<SevenBreadItem>().itemName}");
         }
 
-        public async void deleteDataFromFirebase(string path)
+        public async void deleteDataFromFirebase(string itemCode)
         {
+            DateTime today = DateTime.Now;
+            string strToday = today.ToString("yyyyMMdd");
+            string path = $"sevenbread/alarm/{strToday}/{itemCode}";
             FirebaseResponse response = await client.DeleteAsync(path);
-            Logger.Info($"[firebase] Success to delete data:{path} --> {response.StatusCode}");
+            Logger.Debug($"[firebase] Success to delete data:{path} --> {response.StatusCode}");
         }
     }
 }

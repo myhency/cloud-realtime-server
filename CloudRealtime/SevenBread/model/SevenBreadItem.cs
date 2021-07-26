@@ -20,5 +20,8 @@ namespace CloudRealtime.SevenBread.model
         public string majorHandler { get; set; }
         public string capturedDate { get; set; }
         public string alarmedTime { get; set; }
+        public string alarmStatus { get; set; }
+        public int presentPrice { get; set; }
+        public double fluctuationRateBy { get; set; }
     }
 }
