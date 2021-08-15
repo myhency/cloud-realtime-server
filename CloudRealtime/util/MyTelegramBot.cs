@@ -19,6 +19,7 @@ namespace CloudRealtime.util
 
         IniFile ini = new IniFile();
         private string telegramToken = "";
+        private string swingTelegramToken = "";
         private TelegramBotClient bot;
         private TelegramBotClient swingbot;
         private string userId;
@@ -32,7 +33,8 @@ namespace CloudRealtime.util
         private void initializer()
         {
             ini.Load(Application.StartupPath + "\\settings.ini");
-            this.telegramToken = ini["Settings"]["Token"].ToString();
+            this.telegramToken = ini["Settings"]["ProdToken"].ToString();
+            this.swingTelegramToken = ini["Settings"]["SwingToken"].ToString();
             this.userId = ini["Settings"]["UserId"].ToString();
             this.swingId = ini["Settings"]["SwingId"].ToString();
 
@@ -46,7 +48,7 @@ namespace CloudRealtime.util
                 bot = new TelegramBotClient(telegramToken);
                 bot.OnMessage += bot_OnMessage;
                 bot.StartReceiving();
-                swingbot = new TelegramBotClient(telegramToken);
+                swingbot = new TelegramBotClient(swingTelegramToken);
                 swingbot.OnMessage += bot_OnMessage;
                 swingbot.StartReceiving();
             }

@@ -92,7 +92,14 @@ namespace CloudRealtime.SevenBread.controller
                                 Thread.Sleep(1500);
                             }
 
-                            myTelegramBot.sendTextMessageAsyncToSwingBot("[007빵] 종가업데이트 완료");
+                            DateTime today = DateTime.Now;
+                            string strNow = today.ToString("yyyy년 MM월 dd일");
+                            string strDay = today.ToString("yyyy-MM-dd");
+
+                            myTelegramBot.sendTextMessageAsyncToBot(
+                                $"✔️ {strNow} 007빵 종목 종가 업데이트가 완료되었습니다.\n" +
+                                "http://myhency.asuscomm.com:13000/service/seven-bread"
+                            );
                             break;
                         }
                         catch (Exception e)

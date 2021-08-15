@@ -13,7 +13,7 @@ namespace CloudRealtime.RealTime.service
     public partial class AlarmService
     {
         private static Logger Logger = LogManager.GetCurrentClassLogger();
-        private const string BASE_URL = "http://192.168.29.189:8080";
+        private const string BASE_URL = "http://192.168.29.242:8080";
         private string token;
         private RestClient client;
         private RestRequest request;
@@ -131,6 +131,32 @@ namespace CloudRealtime.RealTime.service
             else
             {
                 Logger.Info("Success to change alarm status");
+                return;
+            }
+        }
+
+        public void updateClosingPrice(long alarmId, string itemCode, int closingPrice)
+        {
+            client = new RestClient(BASE_URL + $"/api/v1/platform/alarm/stockItem/closingPrice/{alarmId}");
+            client.Timeout = -1;
+            request = new RestRequest(Method.POST);
+            request.AddParameter("Authorization", "Bearer " + this.token, ParameterType.HttpHeader);
+            request.AddJsonBody(new
+            {
+                itemCode = itemCode,
+                closingPrice = closingPrice,
+            });
+
+            response = client.Execute(request);
+
+            if (response.StatusCode != System.Net.HttpStatusCode.OK)
+            {
+                Logger.Error("Error to change alarm closing price");
+                return;
+            }
+            else
+            {
+                Logger.Info("Success to change alarm closing price");
                 return;
             }
         }

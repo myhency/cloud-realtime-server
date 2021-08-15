@@ -23,17 +23,11 @@ namespace CloudRealtime
     public partial class StockMiner : Form, ITrEventHandler, IKiwoomAPI
     {
         private static Logger Logger = LogManager.GetCurrentClassLogger();
-        private DailyCrawler dailyCrawler;
-        //private Alrime alrime;
-        //private TrEventHandler trEventHandler;
-        //private RealDataEventHandler realDataEventHandler;
-        private OtherFunctions otherFunctions;
         private RealTimeController realTimeController;
         private RealConditionController realConditionController;
         private StockItemController stockItemController;
         private MyTelegramBot myTelegramBot;
         private SevenBreadController sevenBreadController;
-        private static DateTime today = DateTime.Now;
 
         public StockMiner()
         {
@@ -48,7 +42,6 @@ namespace CloudRealtime
         private void axKHOpenAPI1_OnEventConnect(object sender, AxKHOpenAPILib._DKHOpenAPIEvents_OnEventConnectEvent e)
         {
             DateTime today = DateTime.Now;
-            DateTime startMarketTime = new DateTime(today.Year, today.Month, today.Day, 09, 0, 0);
             string strNow = today.ToString("yyyy년 MM월 dd일");
 
             if (e.nErrCode == 0) //로그인 성공시
@@ -63,32 +56,19 @@ namespace CloudRealtime
                 stockItemController = new StockItemController(axKHOpenAPI1);
 
                 //007빵 초기화
-                this.sevenBreadController = new SevenBreadController(axKHOpenAPI1);
+                //this.sevenBreadController = new SevenBreadController(axKHOpenAPI1);
 
-                //가격수집 서비스 초기화
+                //알리미 서비스 초기화
                 this.realTimeController = new RealTimeController(axKHOpenAPI1);
 
-                //조건검색 서비스 초기화
-                this.realConditionController = new RealConditionController(axKHOpenAPI1);
-
-                ////realConditionController.sendCondition("유통거래량_코스피", false);
+                //유통주식대비거래량 서비스 초기화
+                //this.realConditionController = new RealConditionController(axKHOpenAPI1);
             }
         }
 
         private void login()
         {
-            //Logger.Debug("login start");
             axKHOpenAPI1.CommConnect();
-        }
-
-        public List<string> getCodeList(string market)
-        {
-           return otherFunctions.GetCodeList(market);
-        }
-
-        public void updateCodeListToGoogleSheet(Opt10001VO opt10001VO)
-        {
-            dailyCrawler.updateCodeListToGoogleSheet(opt10001VO);
         }
     }
 }

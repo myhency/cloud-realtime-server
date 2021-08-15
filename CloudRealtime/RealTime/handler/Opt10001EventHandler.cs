@@ -17,7 +17,7 @@ namespace CloudRealtime.RealTime.handler
     {
         private static Logger logger = LogManager.GetCurrentClassLogger();
         private AxKHOpenAPILib.AxKHOpenAPI axKHOpenAPI1;
-        private SevenBreadService sevenBreadService;
+        private AlarmService alarmService;
         private OtherFunctions otherFunctions;
         private MyTelegramBot myTelegramBot;
         private int screenNumber = 7001;
@@ -26,7 +26,7 @@ namespace CloudRealtime.RealTime.handler
         {
             this.axKHOpenAPI1 = axKHOpenAPI;
             this.myTelegramBot = new MyTelegramBot();
-            this.sevenBreadService = new SevenBreadService();
+            this.alarmService = new AlarmService();
             this.otherFunctions = new OtherFunctions(axKHOpenAPI);
             this.axKHOpenAPI1.OnReceiveTrData += axKHOpenAPI1_OnReceiveTrData;
 
@@ -37,32 +37,24 @@ namespace CloudRealtime.RealTime.handler
         {
         }
 
-        public void requestTrOpt10001(string itemCode, string trName)
+        public void requestTrOpt10001(long alarmId, string itemCode, string trName)
         {
             logger.Debug($"requestTrOpt10001: {itemCode}, trName: {trName}");
             this.axKHOpenAPI1.SetInputValue("종목코드", itemCode);
-            int x = this.axKHOpenAPI1.CommRqData($"주식기본정보요청_{trName}_{itemCode}", "opt10001", 0, screenNumber.ToString());
+            int x = this.axKHOpenAPI1.CommRqData($"주식기본정보요청_{trName}_{alarmId}", "opt10001", 0, screenNumber.ToString());
             logger.Debug($"requestTrOpt10001 result : {x}");
         }
 
         private void axKHOpenAPI1_OnReceiveTrData(object sender, AxKHOpenAPILib._DKHOpenAPIEvents_OnReceiveTrDataEvent e)
         {
             logger.Debug("axKHOpenAPI1_OnReceiveTrData");
-            if (e.sRQName.Contains("주식기본정보요청_007빵_"))
+            if (e.sRQName.Contains("주식기본정보요청_알리미종가업데이트_"))
             {
                 Opt10001VO opt10001VO = getOpt10001VO(e.sTrCode, e.sRQName);
-                logger.Debug(e.sTrCode);
-                logger.Debug(e.sRQName);
+                string[] rqNameArr = e.sRQName.Split('_');
 
-                sevenBreadService.updateSevenBreadItemCapturedDay(opt10001VO);
+                alarmService.updateClosingPrice(long.Parse(rqNameArr[3]), opt10001VO.종목코드, opt10001VO.현재가);
                 
-            }
-            else if (e.sRQName.Contains("주식기본정보요청_007빵종가업데이트_"))
-            {
-                Opt10001VO opt10001VO = getOpt10001VO(e.sTrCode, e.sRQName);
-                logger.Debug(e.sTrCode);
-                logger.Debug(e.sRQName);
-                sevenBreadService.updateSevenBreadItemToday(opt10001VO);
             }
         }
 

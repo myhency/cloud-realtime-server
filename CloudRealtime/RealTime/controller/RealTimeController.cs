@@ -22,6 +22,7 @@ namespace CloudRealtime.RealTime.controller
         private RealDataEventHandler realDataEventHandler;
         private List<Alarm> alarmList;
         private MyTelegramBot myTelegramBot;
+        private Opt10001EventHandler opt10001EventHandler;
 
         public RealTimeController(AxKHOpenAPILib.AxKHOpenAPI axKHOpenAPI)
         {
@@ -31,6 +32,7 @@ namespace CloudRealtime.RealTime.controller
             //COMPLETE. 실시간으로 입력되는 알람은 Kafka consumer가 가져오도록 구현해야 함.
             this.alarmList = this.alarmService.getAlarmList();
             this.realDataEventHandler = new RealDataEventHandler(axKHOpenAPI, this.alarmList);
+            this.opt10001EventHandler = new Opt10001EventHandler(axKHOpenAPI);
 
             initialize();
         }
@@ -124,6 +126,45 @@ namespace CloudRealtime.RealTime.controller
 
             t1.Start();
             this.myTelegramBot.sendTextMessageAsyncToSwingBot("[훈련소알리미] Kafka 실시간 쓰레드 시작");
+
+            Thread t2 = new Thread(new ThreadStart(() =>
+            {
+                Thread.Sleep(10000);
+                Logger.Info("알리미 종목 종가정보 업데이트 쓰레드 시작");
+
+                TimeSpan triggerTime = new TimeSpan(15, 40, 0);
+
+                while (true)
+                {
+                    TimeSpan timeNow = DateTime.Now.TimeOfDay;
+
+                    //if (timeNow > triggerTime)
+                    if (true)
+                    {
+                        try
+                        {
+                            this.alarmList = this.alarmService.getAlarmList();
+
+                            foreach (Alarm item in alarmList)
+                            {
+                                opt10001EventHandler.requestTrOpt10001(
+                                    item.alarmId, 
+                                    item.itemCode, 
+                                    "주식기본정보요청_알리미종가업데이트"
+                                );
+                                Thread.Sleep(1500);
+                            }
+                            break;
+                        }
+                        catch (Exception e)
+                        {
+                            Logger.Error(e.Message);
+                        }
+                    }
+                }
+            }));
+
+            t2.Start();
         }
     }
 }
