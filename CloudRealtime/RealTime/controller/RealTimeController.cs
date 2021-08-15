@@ -138,8 +138,7 @@ namespace CloudRealtime.RealTime.controller
                 {
                     TimeSpan timeNow = DateTime.Now.TimeOfDay;
 
-                    //if (timeNow > triggerTime)
-                    if (true)
+                    if (timeNow > triggerTime)
                     {
                         try
                         {
