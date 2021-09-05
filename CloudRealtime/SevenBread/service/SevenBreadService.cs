@@ -165,7 +165,7 @@ namespace CloudRealtime.SevenBread.service
         }
 
         public string createSevenBreadItemHistory(string itemName, string itemCode, int startingPrice,
-            int highestPrice, int lowestPrice, int closingPrice, string capturedDate)
+            int highestPrice, int lowestPrice, int closingPrice, string capturedDate, int capturedPrice)
         {
             client = new RestClient(BASE_URL + "/api/v1/platform/sevenbread/item/history");
             client.Timeout = -1;
@@ -180,6 +180,7 @@ namespace CloudRealtime.SevenBread.service
                 lowestPrice,
                 closingPrice,
                 capturedDate,
+                capturedPrice,
             });
 
             response = client.Execute(request);
