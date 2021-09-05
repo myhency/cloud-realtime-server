@@ -13,7 +13,7 @@ namespace CloudRealtime.RealTime.service
     public partial class AlarmService
     {
         private static Logger Logger = LogManager.GetCurrentClassLogger();
-        private const string BASE_URL = "http://192.168.29.242:8080";
+        private const string BASE_URL = "http://192.168.29.189:8080";
         private string token;
         private RestClient client;
         private RestRequest request;

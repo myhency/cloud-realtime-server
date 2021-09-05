@@ -77,23 +77,49 @@ namespace CloudRealtime.RealCondition.handler
             {
                 Opt10001VO opt10001VO = getOpt10001VO(e.sTrCode, e.sRQName);
 
-                string message = $"🚍 빵셔틀 포착 알림 🚍\n" +
+                string message = $"🎡 250일 신고거래량 포착 알림 🎡\n" +
                         $"\n" +
                         $"종목명 : {opt10001VO.종목명} \n" +
                         $"현재가 : {String.Format("{0:#,###}", opt10001VO.현재가)} ({opt10001VO.등락율}%)\n" +
                         $"거래량 : {String.Format("{0:#,###}", opt10001VO.거래량)} \n" +
-                        $"유통주식대비거래량 : {Math.Round(((double.Parse(opt10001VO.거래량.ToString()) / (double.Parse(opt10001VO.유통주식.ToString()) * 1000)) * 100 * 100)/100)}% \n" +
+                        $"유통주식대비 현재거래량 : {Math.Round(((double.Parse(opt10001VO.거래량.ToString()) / (double.Parse(opt10001VO.유통주식.ToString()) * 1000)) * 100 * 100) / 100)}% \n" +
+                        $"250일 최고 : {String.Format("{0:#,###}", opt10001VO.최고250)} / {opt10001VO.최고가일250:yyyy-MM-dd} / {opt10001VO.최고가대비율250}% \n" +
+                        $"250일 최저 : {String.Format("{0:#,###}", opt10001VO.최저250)} / {opt10001VO.최저가일250:yyyy-MM-dd} / {opt10001VO.최저가대비율250}% \n" +
+                        $"외인소진률 : {opt10001VO.외인소진률}% \n" +
+                        $"시가총액 / 매출액 :  {String.Format("{0:#,###}", opt10001VO.시가총액)}억 /  {String.Format("{0:#,###}", opt10001VO.매출액)}억\n" +
                         "차트보기 \n" +
                         "https://m.alphasquare.co.kr/service/chart?code=" + opt10001VO.종목코드 + "\n" +
                         "종목정보(알파스퀘어) \n" +
-                        "https://alphasquare.co.kr/home/stock/stock-summary?code=" + opt10001VO.종목코드 + "\n" +
-                        "종목정보(네이버) \n" +
-                        "https://finance.naver.com/item/main.nhn?code=" + opt10001VO.종목코드;
+                        "https://alphasquare.co.kr/home/stock/stock-summary?code=" + opt10001VO.종목코드 + "\n";
 
                 logger.Info(message);
 
-                myTelegramBot.sendTextMessageAsyncToSwingBot(message);
+                myTelegramBot.sendTextMessageAsyncToBot(message);
             }
+            //else if (e.sRQName.Contains("주식기본정보요청_빵셔틀단타"))
+            //{
+            //    Opt10001VO opt10001VO = getOpt10001VO(e.sTrCode, e.sRQName);
+
+            //    string message = $"🚍 빵셔틀 단타 포착 알림 🚍\n" +
+            //            $"\n" +
+            //            $"종목명 : {opt10001VO.종목명} \n" +
+            //            $"현재가 : {String.Format("{0:#,###}", opt10001VO.현재가)} ({opt10001VO.등락율}%)\n" +
+            //            $"거래량 : {String.Format("{0:#,###}", opt10001VO.거래량)} \n" +
+            //            $"유통주식대비 현재거래량 : {Math.Round(((double.Parse(opt10001VO.거래량.ToString()) / (double.Parse(opt10001VO.유통주식.ToString()) * 1000)) * 100 * 100) / 100)}% \n" +
+            //            $"250일 최고 : {String.Format("{0:#,###}", opt10001VO.최고250)} / {opt10001VO.최고가일250:yyyy-MM-dd} / {opt10001VO.최고가대비율250}% \n" +
+            //            $"250일 최저 : {String.Format("{0:#,###}", opt10001VO.최저250)} / {opt10001VO.최저가일250:yyyy-MM-dd} / {opt10001VO.최저가대비율250}% \n" +
+            //            $"외인소진률 : {opt10001VO.외인소진률}% \n" +
+            //            $"시가총액 / 매출액 :  {String.Format("{0:#,###}", opt10001VO.시가총액)}억 /  {String.Format("{0:#,###}", opt10001VO.매출액)}억\n" +
+            //            "차트보기 \n" +
+            //            "https://m.alphasquare.co.kr/service/chart?code=" + opt10001VO.종목코드 + "\n" +
+            //            "종목정보(알파스퀘어) \n" +
+            //            "https://alphasquare.co.kr/home/stock/stock-summary?code=" + opt10001VO.종목코드 + "\n";
+
+
+            //    logger.Info(message);
+
+            //    myTelegramBot.sendTextMessageAsyncToBot(message);
+            //}
         }
 
         public void sendFileAsyncToBot()
@@ -107,7 +133,7 @@ namespace CloudRealtime.RealCondition.handler
             opt10001VO.종목코드 = axKHOpenAPI1.GetCommData(sTrCode, sRQName, 0, "종목코드").Trim();
             opt10001VO.종목명 = axKHOpenAPI1.GetCommData(sTrCode, sRQName, 0, "종목명").Trim();
             opt10001VO.결산월 = axKHOpenAPI1.GetCommData(sTrCode, sRQName, 0, "결산월").Trim();
-            opt10001VO.액면가 = System.String.IsNullOrEmpty(axKHOpenAPI1.GetCommData(sTrCode, sRQName, 0, "액면가").Trim()) ? 0 : int.Parse(axKHOpenAPI1.GetCommData(sTrCode, sRQName, 0, "액면가").Trim());
+            //opt10001VO.액면가 = System.String.IsNullOrEmpty(axKHOpenAPI1.GetCommData(sTrCode, sRQName, 0, "액면가").Trim()) ? 0 : int.Parse(axKHOpenAPI1.GetCommData(sTrCode, sRQName, 0, "액면가").Trim());
             opt10001VO.자본금 = System.String.IsNullOrEmpty(axKHOpenAPI1.GetCommData(sTrCode, sRQName, 0, "자본금").Trim()) ? 0 : int.Parse(axKHOpenAPI1.GetCommData(sTrCode, sRQName, 0, "자본금").Trim());
             opt10001VO.상장주식 = System.String.IsNullOrEmpty(axKHOpenAPI1.GetCommData(sTrCode, sRQName, 0, "상장주식").Trim()) ? 0 : int.Parse(axKHOpenAPI1.GetCommData(sTrCode, sRQName, 0, "상장주식").Trim());
             opt10001VO.신용비율 = System.String.IsNullOrEmpty(axKHOpenAPI1.GetCommData(sTrCode, sRQName, 0, "신용비율").Trim()) ? 0 : float.Parse(axKHOpenAPI1.GetCommData(sTrCode, sRQName, 0, "신용비율").Trim());

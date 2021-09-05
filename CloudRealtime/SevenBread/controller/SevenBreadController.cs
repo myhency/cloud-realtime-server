@@ -88,7 +88,7 @@ namespace CloudRealtime.SevenBread.controller
                             this.sevenBreadItemList = this.sevenBreadService.getSevenBreadItemList();
                             foreach (SevenBreadItem item in this.sevenBreadItemList)
                             {
-                                opt10001EventHandler.requestTrOpt10001(item.itemCode, $"007빵종가업데이트_{item.itemName}");
+                                opt10001EventHandler.requestTrOpt10001(item.itemCode, $"007빵종가업데이트_{item.itemName}_{item.capturedDate}_{item.capturedPrice}");
                                 Thread.Sleep(1500);
                             }
 
@@ -96,10 +96,7 @@ namespace CloudRealtime.SevenBread.controller
                             string strNow = today.ToString("yyyy년 MM월 dd일");
                             string strDay = today.ToString("yyyy-MM-dd");
 
-                            myTelegramBot.sendTextMessageAsyncToBot(
-                                $"✔️ {strNow} 007빵 종목 종가 업데이트가 완료되었습니다.\n" +
-                                "http://myhency.asuscomm.com:13000/service/seven-bread"
-                            );
+                            myTelegramBot.sendTextMessageAsyncToBot($"✔️ {strNow} 007빵 종목 종가 업데이트가 완료되었습니다.");
                             break;
                         }
                         catch (Exception e)

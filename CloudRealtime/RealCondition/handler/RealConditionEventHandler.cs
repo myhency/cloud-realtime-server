@@ -113,8 +113,7 @@ namespace CloudRealtime.RealCondition.handler
                         string strDay = today.ToString("yyyy-MM-dd");
                         this.myTelegramBot.sendTextMessageAsyncToBot(
                             $"✔️ {strNow} 유통주식대비 거래량 비율 업데이트가 완료되었습니다. " +
-                            $"오늘 하루도 수고많으셨습니다. \n" +
-                            $"http://myhency.asuscomm.com:13000/service/analyze/volume/" + strDay);
+                            $"오늘 하루도 수고많으셨습니다.");
                         break;
                     }
                 }
@@ -124,7 +123,7 @@ namespace CloudRealtime.RealCondition.handler
 
             Thread t3 = new Thread(new ThreadStart(() =>
             {
-                Logger.Info("빵셔틀 조건검색 쓰레드 시작");
+                Logger.Info("250일 신고거래량 조건검색 쓰레드 시작");
                 TimeSpan triggerTime = new TimeSpan(08, 30, 0);
                 while (true)
                 {
@@ -140,6 +139,25 @@ namespace CloudRealtime.RealCondition.handler
             }));
 
             t3.Start();
+
+            //Thread t4 = new Thread(new ThreadStart(() =>
+            //{
+            //    Logger.Info("빵셔틀 조건검색 쓰레드 시작");
+            //    TimeSpan triggerTime = new TimeSpan(08, 30, 0);
+            //    while (true)
+            //    {
+            //        TimeSpan timeNow = DateTime.Now.TimeOfDay;
+
+            //        if (timeNow > triggerTime)
+            //        {
+            //            Thread.Sleep(60000);
+            //            sendCondition("3000", "빵셔틀단타", true);
+            //            break;
+            //        }
+            //    }
+            //}));
+
+            //t4.Start();
 
         }
 
@@ -208,6 +226,11 @@ namespace CloudRealtime.RealCondition.handler
                     }
 
                     opt10001EventHandler.requestTrOpt10001(itemCode, "빵셔틀종목");
+                }
+                else if (e.strConditionName.Equals("빵셔틀단타"))
+                {
+                    string itemCode = e.sTrCode;
+                    opt10001EventHandler.requestTrOpt10001(itemCode, "빵셔틀단타");
                 }
             }
             else

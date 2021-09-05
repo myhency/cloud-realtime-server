@@ -64,6 +64,16 @@ namespace CloudRealtime.SevenBread.handler
                 logger.Debug(e.sTrCode);
                 logger.Debug(e.sRQName);
                 sevenBreadService.updateSevenBreadItemToday(opt10001VO);
+                string capturedDate = e.sRQName.Split('_')[3];
+                sevenBreadService.createSevenBreadItemHistory(
+                    opt10001VO.종목명,
+                    opt10001VO.종목코드,
+                    opt10001VO.시가,
+                    opt10001VO.고가,
+                    opt10001VO.저가,
+                    opt10001VO.현재가,
+                    capturedDate
+                );
             }
         }
 

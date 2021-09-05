@@ -95,7 +95,8 @@ namespace CloudRealtime.SevenBread.service
                         });
                     } catch (Exception e)
                     {
-                        Logger.Error($"[aaaaaaget sevenBread list]{e.Message}");
+                        Logger.Error($"[get sevenBread list] {e.Message}");
+                        Logger.Info($"[get sevenBread list] possibly item added");
                     }
                         
                 }
@@ -158,6 +159,39 @@ namespace CloudRealtime.SevenBread.service
             else
             {
                 Logger.Info("Success to update captured day sevenbread item");
+                var jObject = JObject.Parse(response.Content);
+                return jObject.GetValue("data").ToString();
+            }
+        }
+
+        public string createSevenBreadItemHistory(string itemName, string itemCode, int startingPrice,
+            int highestPrice, int lowestPrice, int closingPrice, string capturedDate)
+        {
+            client = new RestClient(BASE_URL + "/api/v1/platform/sevenbread/item/history");
+            client.Timeout = -1;
+            request = new RestRequest(Method.POST);
+            request.AddParameter("Authorization", "Bearer " + this.token, ParameterType.HttpHeader);
+            request.AddJsonBody(new
+            {
+                itemName,
+                itemCode,
+                startingPrice,
+                highestPrice,
+                lowestPrice,
+                closingPrice,
+                capturedDate,
+            });
+
+            response = client.Execute(request);
+
+            if (response.StatusCode != System.Net.HttpStatusCode.Created)
+            {
+                Logger.Error("Error to insert sevenbread item history");
+                return null;
+            }
+            else
+            {
+                Logger.Info("Success to sevenbread item history");
                 var jObject = JObject.Parse(response.Content);
                 return jObject.GetValue("data").ToString();
             }
