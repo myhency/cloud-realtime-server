@@ -51,11 +51,11 @@ namespace CloudRealtime.SevenBread.handler
             logger.Debug("axKHOpenAPI1_OnReceiveTrData");
             if (e.sRQName.Contains("주식기본정보요청_007빵_"))
             {
-                Opt10001VO opt10001VO = getOpt10001VO(e.sTrCode, e.sRQName);
+                //Opt10001VO opt10001VO = getOpt10001VO(e.sTrCode, e.sRQName);
                 logger.Debug(e.sTrCode);
                 logger.Debug(e.sRQName);
 
-                sevenBreadService.updateSevenBreadItemCapturedDay(opt10001VO);
+                //sevenBreadService.updateSevenBreadItemCapturedDay(opt10001VO);
                 
             }
             else if (e.sRQName.Contains("주식기본정보요청_007빵종가업데이트_"))
@@ -76,6 +76,13 @@ namespace CloudRealtime.SevenBread.handler
                     capturedDate,
                     capturedPrice
                 );
+            }
+            else if (e.sRQName.Contains("주식기본정보요청_뉴007빵종가업데이트_"))
+            {
+                Opt10001VO opt10001VO = getOpt10001VO(e.sTrCode, e.sRQName);
+                logger.Debug(e.sTrCode);
+                logger.Debug(e.sRQName);
+                sevenBreadService.updateSevenBreadItemToday(opt10001VO);
             }
         }
 

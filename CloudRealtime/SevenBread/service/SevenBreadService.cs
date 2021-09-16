@@ -1,4 +1,5 @@
-﻿using CloudRealtime.SevenBread.model;
+﻿using CloudRealtime.model;
+using CloudRealtime.SevenBread.model;
 using Newtonsoft.Json.Linq;
 using NLog;
 using RestSharp;
@@ -14,7 +15,7 @@ namespace CloudRealtime.SevenBread.service
     public partial class SevenBreadService
     {
         private static Logger Logger = LogManager.GetCurrentClassLogger();
-        private const string BASE_URL = "http://192.168.29.242:8080";
+        private const string BASE_URL = "http://192.168.29.189:8080";
         private string token;
         private RestClient client;
         private RestRequest request;
@@ -134,19 +135,19 @@ namespace CloudRealtime.SevenBread.service
             }
         }
 
-        public string updateSevenBreadItemCapturedDay(Opt10001VO opt10001VO)
+        public string updateSevenBreadItemCapturedDay(string itemCode, Opt10086VO opt10086VO)
         {
-            client = new RestClient(BASE_URL + "/api/v1/platform/sevenbread/item/" + opt10001VO.종목코드);
+            client = new RestClient(BASE_URL + "/api/v1/platform/sevenbread/item/" + itemCode);
             client.Timeout = -1;
             request = new RestRequest(Method.PUT);
             request.AddParameter("Authorization", "Bearer " + this.token, ParameterType.HttpHeader);
             request.AddJsonBody(new
             {
-                closingPrice = opt10001VO.현재가,
-                capturedPrice = opt10001VO.현재가,
-                fluctuationRate = opt10001VO.등락율,
-                priceByYesterday = opt10001VO.전일대비,
-                volume = opt10001VO.거래량,
+                closingPrice = opt10086VO.종가,
+                capturedPrice = opt10086VO.종가,
+                fluctuationRate = opt10086VO.등락률,
+                priceByYesterday = opt10086VO.전일비,
+                volume = opt10086VO.거래량,
             });
 
             response = client.Execute(request);

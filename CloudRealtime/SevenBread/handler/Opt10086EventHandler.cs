@@ -42,6 +42,11 @@ namespace CloudRealtime.SevenBread.handler
         public void requestTrOpt10086(string itemCode, string detectedDate, string trName)
         {
             logger.Debug($"requestTrOpt10086: {itemCode}, {detectedDate}, trName: {trName}");
+
+            DateTime dt;
+            dt = Convert.ToDateTime(detectedDate);
+            detectedDate = dt.ToString("yyyyMMdd");
+
             this.axKHOpenAPI1.SetInputValue("종목코드", itemCode);
             this.axKHOpenAPI1.SetInputValue("조회일자", detectedDate);
             this.axKHOpenAPI1.SetInputValue("표시구분", "0");
@@ -52,7 +57,15 @@ namespace CloudRealtime.SevenBread.handler
         private void axKHOpenAPI1_OnReceiveTrData(object sender, AxKHOpenAPILib._DKHOpenAPIEvents_OnReceiveTrDataEvent e)
         {
             logger.Debug("axKHOpenAPI1_OnReceiveTrData");
+            if (e.sRQName.Contains("주식기본정보요청_007빵_"))
+            {
+                Opt10086VO opt10086VO = getOpt10086VO(e.sTrCode, e.sRQName);
+                logger.Debug(e.sTrCode);
+                logger.Debug(e.sRQName);
 
+                sevenBreadService.updateSevenBreadItemCapturedDay(e.sRQName.Split('_')[2], opt10086VO);
+
+            }
         }
 
         private Opt10086VO getOpt10086VO(string sTrCode, string sRQName)
@@ -60,7 +73,7 @@ namespace CloudRealtime.SevenBread.handler
             Opt10086VO opt10086VO = new Opt10086VO();
             opt10086VO.종가 = Math.Abs(int.Parse(axKHOpenAPI1.GetCommData(sTrCode, sRQName, 0, "종가").Trim()));
             opt10086VO.거래량 = int.Parse(axKHOpenAPI1.GetCommData(sTrCode, sRQName, 0, "거래량").Trim());
-            opt10086VO.등락률 = float.Parse(axKHOpenAPI1.GetCommData(sTrCode, sRQName, 0, "등락율").Trim());
+            opt10086VO.등락률 = float.Parse(axKHOpenAPI1.GetCommData(sTrCode, sRQName, 0, "등락률").Trim());
             opt10086VO.전일비 = int.Parse(axKHOpenAPI1.GetCommData(sTrCode, sRQName, 0, "전일비").Trim());
             
             return opt10086VO;
