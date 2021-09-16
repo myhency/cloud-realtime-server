@@ -59,10 +59,10 @@ namespace CloudRealtime
                 this.sevenBreadController = new SevenBreadController(axKHOpenAPI1);
 
                 //알리미 서비스 초기화
-                this.realTimeController = new RealTimeController(axKHOpenAPI1);
+                //this.realTimeController = new RealTimeController(axKHOpenAPI1);
 
                 //유통주식대비거래량 서비스 초기화
-                this.realConditionController = new RealConditionController(axKHOpenAPI1);
+                //this.realConditionController = new RealConditionController(axKHOpenAPI1);
             }
         }
 
