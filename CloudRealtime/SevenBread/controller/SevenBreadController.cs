@@ -98,7 +98,7 @@ namespace CloudRealtime.SevenBread.controller
                             string strNow = today.ToString("yyyy년 MM월 dd일");
                             string strDay = today.ToString("yyyy-MM-dd");
 
-                            myTelegramBot.sendTextMessageAsyncToBot($"✔️ {strNow} 007빵 종목 종가 업데이트가 완료되었습니다.");
+                            //myTelegramBot.sendTextMessageAsyncToBot($"✔️ {strNow} 007빵 종목 종가 업데이트가 완료되었습니다.");
                             break;
                         }
                         catch (Exception e)
@@ -118,7 +118,7 @@ namespace CloudRealtime.SevenBread.controller
             var conf = new ConsumerConfig
             {
                 GroupId = "sevenBread-consumer-group",
-                BootstrapServers = "192.168.29.189:9092",
+                BootstrapServers = "192.168.29.104:9092",
                 AutoOffsetReset = AutoOffsetReset.Earliest
             };
 

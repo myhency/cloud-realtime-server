@@ -70,75 +70,75 @@ namespace CloudRealtime.RealCondition.handler
             // t1과 t2의 용도:
             //  - t1은 16:00가 되면 "유통거래량" 이라는 조건식을 검색해서 종목을 찾는다.
             //  - t2는 t1이 종목을 다 찾으면 종목하나씩 tr 요청을 해서 종목정보를 받고 db에 업데이트 한다.
-            Thread t1 = new Thread(new ThreadStart(() =>
-            {
-                Logger.Info("유통거래량 전송 쓰레드 시작");
-                TimeSpan triggerTime = new TimeSpan(16, 0, 0);
-                while (true)
-                {
-                    TimeSpan timeNow = DateTime.Now.TimeOfDay;
+            //Thread t1 = new Thread(new ThreadStart(() =>
+            //{
+            //    Logger.Info("유통거래량 전송 쓰레드 시작");
+            //    TimeSpan triggerTime = new TimeSpan(15, 45, 0);
+            //    while (true)
+            //    {
+            //        TimeSpan timeNow = DateTime.Now.TimeOfDay;
 
-                    if (timeNow > triggerTime)
-                    {
-                        sendCondition("3000", "유통거래량", false);
-                        break;
-                    }
-                }
-            }));
+            //        if (timeNow > triggerTime)
+            //        {
+            //            sendCondition("3000", "유통거래량", false);
+            //            break;
+            //        }
+            //    }
+            //}));
 
-            t1.Start();
+            //t1.Start();
 
-            Thread t2 = new Thread(new ThreadStart(() =>
-            {
-                Logger.Info("유통거래량 수집 쓰레드 시작");
-                TimeSpan triggerTime = new TimeSpan(16, 0, 0);
-                while (true)
-                {
-                    if (itemCodeList.Length > 0)
-                    {
-                        foreach (string itemCode in itemCodeList)
-                        {
-                            if (itemCode.Length > 0)
-                            {
-                                opt10001EventHandler.requestTrOpt10001(itemCode, $"유통거래량_{itemCodeList.Length.ToString()}");
-                                Thread.Sleep(1500);
-                                itemCodeList = itemCodeList.Where(v => v != itemCode).ToArray();
-                            }
-                        }
+            //Thread t2 = new Thread(new ThreadStart(() =>
+            //{
+            //    Logger.Info("유통거래량 수집 쓰레드 시작");
+            //    TimeSpan triggerTime = new TimeSpan(15, 45, 0);
+            //    while (true)
+            //    {
+            //        if (itemCodeList.Length > 0)
+            //        {
+            //            foreach (string itemCode in itemCodeList)
+            //            {
+            //                if (itemCode.Length > 0)
+            //                {
+            //                    opt10001EventHandler.requestTrOpt10001(itemCode, $"유통거래량_{itemCodeList.Length.ToString()}");
+            //                    Thread.Sleep(1500);
+            //                    itemCodeList = itemCodeList.Where(v => v != itemCode).ToArray();
+            //                }
+            //            }
 
-                        Thread.Sleep(60000);
-                        DateTime today = DateTime.Now;
-                        DateTime startMarketTime = new DateTime(today.Year, today.Month, today.Day, 09, 0, 0);
-                        string strNow = today.ToString("yyyy년 MM월 dd일");
-                        string strDay = today.ToString("yyyy-MM-dd");
-                        this.myTelegramBot.sendTextMessageAsyncToBot(
-                            $"✔️ {strNow} 유통주식대비 거래량 비율 업데이트가 완료되었습니다. " +
-                            $"오늘 하루도 수고많으셨습니다.");
-                        break;
-                    }
-                }
-            }));
+            //            Thread.Sleep(60000);
+            //            DateTime today = DateTime.Now;
+            //            DateTime startMarketTime = new DateTime(today.Year, today.Month, today.Day, 09, 0, 0);
+            //            string strNow = today.ToString("yyyy년 MM월 dd일");
+            //            string strDay = today.ToString("yyyy-MM-dd");
+            //            this.myTelegramBot.sendTextMessageAsyncToBot(
+            //                $"✔️ {strNow} 유통주식대비 거래량 비율 업데이트가 완료되었습니다. " +
+            //                $"오늘 하루도 수고많으셨습니다.");
+            //            break;
+            //        }
+            //    }
+            //}));
 
-            t2.Start();
+            //t2.Start();
 
-            Thread t3 = new Thread(new ThreadStart(() =>
-            {
-                Logger.Info("250일 신고거래량 조건검색 쓰레드 시작");
-                TimeSpan triggerTime = new TimeSpan(08, 30, 0);
-                while (true)
-                {
-                    TimeSpan timeNow = DateTime.Now.TimeOfDay;
+            //Thread t3 = new Thread(new ThreadStart(() =>
+            //{
+            //    Logger.Info("250일 신고거래량 조건검색 쓰레드 시작");
+            //    TimeSpan triggerTime = new TimeSpan(08, 30, 0);
+            //    while (true)
+            //    {
+            //        TimeSpan timeNow = DateTime.Now.TimeOfDay;
 
-                    if (timeNow > triggerTime)
-                    {
-                        Thread.Sleep(30000);
-                        sendCondition("3000", "오늘돈이몰린종목", true);
-                        break;
-                    }
-                }
-            }));
+            //        if (timeNow > triggerTime)
+            //        {
+            //            Thread.Sleep(30000);
+            //            sendCondition("3000", "오늘돈이몰린종목", true);
+            //            break;
+            //        }
+            //    }
+            //}));
 
-            t3.Start();
+            //t3.Start();
 
             //Thread t4 = new Thread(new ThreadStart(() =>
             //{

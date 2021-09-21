@@ -15,7 +15,7 @@ namespace CloudRealtime.util
             var conf = new ConsumerConfig
             {
                 GroupId = "test-consumer-group",
-                BootstrapServers = "192.168.29.189:9092",
+                BootstrapServers = "192.168.29.104:9092",
                 AutoOffsetReset = AutoOffsetReset.Earliest
             };
 
