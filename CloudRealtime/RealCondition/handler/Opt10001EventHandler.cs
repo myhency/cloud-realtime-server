@@ -56,9 +56,9 @@ namespace CloudRealtime.RealCondition.handler
 
         private void axKHOpenAPI1_OnReceiveTrData(object sender, AxKHOpenAPILib._DKHOpenAPIEvents_OnReceiveTrDataEvent e)
         {
-            logger.Debug("axKHOpenAPI1_OnReceiveTrData");
             if (e.sRQName.Contains("주식기본정보요청_유통거래량_"))
             {
+                logger.Debug("axKHOpenAPI1_OnReceiveTrData:주식기본정보요청_유통거래량_");
                 Opt10001VO opt10001VO = getOpt10001VO(e.sTrCode, e.sRQName);
                 logger.Debug(e.sTrCode);
                 logger.Debug(e.sRQName);

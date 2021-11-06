@@ -21,6 +21,7 @@ namespace CloudRealtime.SevenBread.controller
         private AxKHOpenAPILib.AxKHOpenAPI axKHOpenAPI1;
         private SevenBreadService sevenBreadService;
         private List<SevenBreadItem> sevenBreadItemList;
+        private List<SevenBreadDeletedItem> sevenBreadDeletedItemList;
         private MyTelegramBot myTelegramBot;
         private Opt10001EventHandler opt10001EventHandler;
         private Opt10086EventHandler opt10086EventHandler;
@@ -73,11 +74,9 @@ namespace CloudRealtime.SevenBread.controller
 
             t2.Start();
 
-
             Thread t3 = new Thread(new ThreadStart(() =>
             {
                 Thread.Sleep(10000);
-                Logger.Info("007빵 종목 종가정보 업데이트 쓰레드 시작");
                 TimeSpan triggerTime = new TimeSpan(15, 35, 0);
                 while (true)
                 {
@@ -85,12 +84,28 @@ namespace CloudRealtime.SevenBread.controller
 
                     if (timeNow > triggerTime)
                     {
+                        Logger.Info("007빵 종목 종가정보 업데이트 쓰레드 시작");
                         try
                         {
                             this.sevenBreadItemList = this.sevenBreadService.getSevenBreadItemList();
+                            this.sevenBreadDeletedItemList = this.sevenBreadService.getSevenBreadDeletedItemList();
+
                             foreach (SevenBreadItem item in this.sevenBreadItemList)
                             {
-                                opt10001EventHandler.requestTrOpt10001(item.itemCode, $"007빵종가업데이트_{item.itemName}_{item.capturedDate}_{item.capturedPrice}");
+                                SevenBreadDeletedItem sevenBreadDeletedItem = new SevenBreadDeletedItem();
+                                sevenBreadDeletedItem.itemName = item.itemName;
+                                sevenBreadDeletedItem.itemCode = item.itemCode;
+                                sevenBreadDeletedItem.capturedDate = item.capturedDate;
+                                sevenBreadDeletedItem.capturedPrice = item.capturedPrice;
+
+                                this.sevenBreadDeletedItemList.Add(sevenBreadDeletedItem);
+                            }
+
+                            this.sevenBreadDeletedItemList = this.sevenBreadDeletedItemList.Distinct().ToList();
+
+                            foreach (SevenBreadDeletedItem item in this.sevenBreadDeletedItemList)
+                            {
+                                opt10001EventHandler.requestTrOpt10001(item.itemCode, $"007빵삭제종가업데이트_{item.itemName}_{item.capturedDate}_{item.capturedPrice}");
                                 Thread.Sleep(1500);
                             }
 
@@ -98,7 +113,7 @@ namespace CloudRealtime.SevenBread.controller
                             string strNow = today.ToString("yyyy년 MM월 dd일");
                             string strDay = today.ToString("yyyy-MM-dd");
 
-                            //myTelegramBot.sendTextMessageAsyncToBot($"✔️ {strNow} 007빵 종목 종가 업데이트가 완료되었습니다.");
+                            myTelegramBot.sendTextMessageAsyncToBot($"✔️ {strNow} 007빵 종가/통계 업데이트가 완료되었습니다.");
                             break;
                         }
                         catch (Exception e)
@@ -110,7 +125,46 @@ namespace CloudRealtime.SevenBread.controller
             }));
 
             t3.Start();
+
+            //Thread t4 = new Thread(new ThreadStart(() =>
+            //{
+            //    Thread.Sleep(10000);
+            //    Logger.Info("007빵 삭제종목 종가정보 업데이트 쓰레드 시작");
+            //    TimeSpan triggerTime = new TimeSpan(15, 50, 0);
+            //    while (true)
+            //    {
+            //        TimeSpan timeNow = DateTime.Now.TimeOfDay;
+
+            //        if (timeNow > triggerTime)
+            //        {
+            //            try
+            //            {
+            //                this.sevenBreadDeletedItemList = this.sevenBreadService.getSevenBreadDeletedItemList();
+            //                foreach (SevenBreadDeletedItem item in this.sevenBreadDeletedItemList)
+            //                {
+            //                    opt10001EventHandler.requestTrOpt10001(item.itemCode, $"007빵삭제종가업데이트_{item.itemName}_{item.capturedDate}_{item.capturedPrice}");
+            //                    Thread.Sleep(1500);
+            //                }
+
+            //                DateTime today = DateTime.Now;
+            //                string strNow = today.ToString("yyyy년 MM월 dd일");
+            //                string strDay = today.ToString("yyyy-MM-dd");
+
+            //                myTelegramBot.sendTextMessageAsyncToBot($"✔️ {strNow} 007빵 통계 업데이트가 완료되었습니다.");
+            //                break;
+            //            }
+            //            catch (Exception e)
+            //            {
+            //                Logger.Error(e.Message);
+            //            }
+            //        }
+            //    }
+            //}));
+
+            //t4.Start();
         }
+
+
 
         private void sevenBreadItemconsumer()
         {

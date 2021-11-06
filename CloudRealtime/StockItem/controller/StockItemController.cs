@@ -6,6 +6,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace CloudRealtime.StockItem.controller
@@ -60,6 +61,7 @@ namespace CloudRealtime.StockItem.controller
                         || item.itemName.Contains("레버리지")
                         || item.itemName.Contains("네비게이터 ")
                         || item.itemName.Contains("HK ")
+                        || item.itemName.Contains("SOL ")
                         || item.itemName.Contains("TIMEFOLIO ")
                         || item.itemName.Contains("FOCUS ")
                         || item.itemName.Contains("메리츠 ")
@@ -79,6 +81,7 @@ namespace CloudRealtime.StockItem.controller
                         || item.itemName.Contains("3우")
                         || item.itemName.Contains("우B")
                         || item.itemName.Contains("호스팩")
+                        || item.itemName.Contains("(합성)")
                         || (item.itemName.Contains("스팩") && item.itemName.EndsWith("호"))
                     ) //ETN, ETF, 스팩 제외
                     {
@@ -86,14 +89,18 @@ namespace CloudRealtime.StockItem.controller
                     }
 
                     Logger.Info($"등록되지 않은 종목: 종목명 - {item.itemName}, 종목코드 - {item.itemCode}");
+                    myTelegramBot.sendTextMessageAsyncToBot($"✔📰 신규상장 : 종목명 - {item.itemName}, 종목코드 - {item.itemCode}");
                     stockItemService.createItem(item);
+                    Thread.Sleep(500);
                     goto End;
                 }
 
                 if (matchedItem.itemName != item.itemName) //종목코드는 같은데 종목명이 다른경우는 종목명을 업데이트 해 준다.
                 {
                     Logger.Info($"종목명이 바뀐 종목: 등록된 이름 - {matchedItem.itemName}, 바뀐 이름 - {item.itemName}");
+                    myTelegramBot.sendTextMessageAsyncToBot($"✔📰 종목명이 변경됨 : 원래 이름 - {matchedItem.itemName}, 바뀐 이름 - {item.itemName}");
                     stockItemService.updateItemName(item);
+                    Thread.Sleep(500);
                 }
 
             End:;

@@ -58,7 +58,7 @@ namespace CloudRealtime.SevenBread.handler
                 //sevenBreadService.updateSevenBreadItemCapturedDay(opt10001VO);
                 
             }
-            else if (e.sRQName.Contains("주식기본정보요청_007빵종가업데이트_"))
+            else if (e.sRQName.Contains("주식기본정보요청_007빵종가업데이트_") || e.sRQName.Contains("주식기본정보요청_007빵삭제종가업데이트_"))
             {
                 Opt10001VO opt10001VO = getOpt10001VO(e.sTrCode, e.sRQName);
                 logger.Debug(e.sTrCode);

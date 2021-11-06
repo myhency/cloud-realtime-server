@@ -262,6 +262,7 @@
     <Compile Include="SevenBread\handler\Opt10001EventHandler.cs" />
     <Compile Include="SevenBread\handler\Opt10086EventHandler.cs" />
     <Compile Include="SevenBread\handler\RealDataEventHandler.cs" />
+    <Compile Include="SevenBread\model\SevenBreadDeletedItem.cs" />
     <Compile Include="SevenBread\model\SevenBreadItem.cs" />
     <Compile Include="SevenBread\model\SevenBreadItemCreationRequestDto.cs" />
     <Compile Include="SevenBread\model\SevenBreadItemHistory.cs" />

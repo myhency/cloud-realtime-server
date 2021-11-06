@@ -106,6 +106,53 @@ namespace CloudRealtime.SevenBread.service
             }
         }
 
+        public List<SevenBreadDeletedItem> getSevenBreadDeletedItemList()
+        {
+            client = new RestClient(BASE_URL + "/api/v1/platform/sevenbread/deleted/history");
+            client.Timeout = -1;
+            request = new RestRequest(Method.GET);
+            request.AddParameter("Authorization", "Bearer " + this.token, ParameterType.HttpHeader);
+
+            response = client.Execute<List<SevenBreadDeletedItem>>(request);
+
+            if (response.StatusCode != System.Net.HttpStatusCode.OK)
+            {
+                Logger.Error("Error to get sevenbread deleted item list");
+                return null;
+            }
+            else
+            {
+                Logger.Info("Success to get sevenbread deleted item list");
+                var result = JObject.Parse(response.Content).GetValue("data");
+                JArray jArray = JArray.Parse(result.ToString());
+
+                List<SevenBreadDeletedItem> sevenBreadDeletedItemList = new List<SevenBreadDeletedItem>();
+
+                foreach (JObject item in jArray)
+                {
+                    try
+                    {
+                        sevenBreadDeletedItemList.Add(new SevenBreadDeletedItem()
+                        {
+                            id = long.Parse(item.GetValue("id").ToString()),
+                            itemCode = item.GetValue("itemCode").ToString(),
+                            itemName = item.GetValue("itemName").ToString(),
+                            capturedPrice = item.GetValue("capturedPrice") == null ? 9999999 : int.Parse(item.GetValue("capturedPrice").ToString()),
+                            capturedDate = item.GetValue("capturedDate").ToString(),
+                            majorHandler = item.GetValue("majorHandler").ToString(),
+                        });
+                    }
+                    catch (Exception e)
+                    {
+                        Logger.Error($"[get sevenBread deleted list] {e.Message}");
+                        Logger.Info($"[get sevenBread deleted list] possibly item added");
+                    }
+                }
+
+                return sevenBreadDeletedItemList;
+            }
+        }
+
         public string updateSevenBreadItemToday(Opt10001VO opt10001VO)
         {
             client = new RestClient(BASE_URL + "/api/v1/platform/sevenbread/item/today/" + opt10001VO.종목코드);

@@ -51,6 +51,7 @@ namespace CloudRealtime
                 //시작메세지 발송
                 this.myTelegramBot.sendTextMessageAsyncToSwingBot("키움API 로그인성공");
                 //this.myTelegramBot.sendTextMessageAsyncToBot($"🤑 {strNow} 클라우드의 주식 훈련소알리미 출발합니다 🤑");
+                //this.myTelegramBot.sendTextMessageAsyncToBot($"테스트메세지입니다.");
 
                 //전체종목리스트 초기화
                 stockItemController = new StockItemController(axKHOpenAPI1);

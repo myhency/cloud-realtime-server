@@ -287,8 +287,14 @@ namespace CloudRealtime.SevenBread.handler
 
         public async void updateDataToFirebase(string path, SevenBreadItem data)
         {
-            FirebaseResponse response = await client.UpdateAsync(path, data);
-            Logger.Debug($"[firebase] Success to update data:{response.ResultAs<SevenBreadItem>().itemName}");
+            try
+            {
+                FirebaseResponse response = await client.UpdateAsync(path, data);
+                Logger.Debug($"[firebase] Success to update data:{response.ResultAs<SevenBreadItem>().itemName}");
+            } catch (Exception e)
+            {
+                myTelegramBot.sendTextMessageAsyncToSwingBot($"[firebase] Fail to update data:{e.Message}");
+            }
         }
 
         public async void deleteDataFromFirebase(string itemCode)

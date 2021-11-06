@@ -158,7 +158,7 @@ namespace CloudRealtime.RealTime.controller
                             string strNow = today.ToString("yyyy년 MM월 dd일");
                             string strDay = today.ToString("yyyy-MM-dd");
 
-                            //myTelegramBot.sendTextMessageAsyncToBot($"✔️ {strNow} 훈련소알리미 종목 종가 업데이트가 완료되었습니다.");
+                            myTelegramBot.sendTextMessageAsyncToBot($"✔️ {strNow} 훈련소알리미 종목 종가 업데이트가 완료되었습니다.");
                             break;
                         }
                         catch (Exception e)

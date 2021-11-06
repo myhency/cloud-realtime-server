@@ -104,7 +104,13 @@ namespace CloudRealtime.util
 
         public async void sendTextMessageAsyncToBot(string alarmMessage)
         {
-            await bot.SendTextMessageAsync(long.Parse(this.userId), alarmMessage);
+            try
+            {
+                await bot.SendTextMessageAsync(long.Parse(this.userId), alarmMessage);
+            } catch (Exception e)
+            {
+                await swingbot.SendTextMessageAsync(long.Parse(this.swingId), e.Message);
+            }
         }
 
         public async void sendTextMessageAsyncToSwingBot(string alarmMessage)
