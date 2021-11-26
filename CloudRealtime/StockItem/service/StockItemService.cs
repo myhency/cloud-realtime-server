@@ -13,7 +13,7 @@ namespace CloudRealtime.StockItem.service
     public partial class StockItemService
     {
         private static Logger Logger = LogManager.GetCurrentClassLogger();
-        private const string BASE_URL = "http://localhost:8080";
+        private const string BASE_URL = "http://myhency.duckdns.org:18080";
         private string token;
         private RestClient client;
         private RestRequest request;

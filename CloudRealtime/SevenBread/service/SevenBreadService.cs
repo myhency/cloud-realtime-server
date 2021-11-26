@@ -15,7 +15,7 @@ namespace CloudRealtime.SevenBread.service
     public partial class SevenBreadService
     {
         private static Logger Logger = LogManager.GetCurrentClassLogger();
-        private const string BASE_URL = "http://localhost:8080";
+        private const string BASE_URL = "http://myhency.duckdns.org:18080";
         private string token;
         private RestClient client;
         private RestRequest request;
@@ -155,6 +155,7 @@ namespace CloudRealtime.SevenBread.service
 
         public string updateSevenBreadItemToday(Opt10001VO opt10001VO)
         {
+            Logger.Info(opt10001VO.종목코드);
             client = new RestClient(BASE_URL + "/api/v1/platform/sevenbread/item/today/" + opt10001VO.종목코드);
             client.Timeout = -1;
             request = new RestRequest(Method.PUT);

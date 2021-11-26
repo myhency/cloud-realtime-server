@@ -172,7 +172,7 @@ namespace CloudRealtime.SevenBread.controller
             var conf = new ConsumerConfig
             {
                 GroupId = "sevenBread-consumer-group",
-                BootstrapServers = "localhost:9092",
+                BootstrapServers = "myhency.duckdns.org:29093",
                 AutoOffsetReset = AutoOffsetReset.Earliest
             };
 
@@ -215,8 +215,9 @@ namespace CloudRealtime.SevenBread.controller
                         }
                     }
                 }
-                catch (OperationCanceledException)
+                catch (OperationCanceledException e)
                 {
+                    Logger.Info(e.Message);
                     c.Close();
                 }
             }

@@ -15,7 +15,7 @@ namespace CloudRealtime.util
             var conf = new ConsumerConfig
             {
                 GroupId = "test-consumer-group",
-                BootstrapServers = "localhost:9092",
+                BootstrapServers = "myhency.duckdns.org:29093",
                 AutoOffsetReset = AutoOffsetReset.Earliest
             };
 
