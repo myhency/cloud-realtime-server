@@ -89,7 +89,7 @@ namespace CloudRealtime.StockItem.controller
                     }
 
                     Logger.Info($"등록되지 않은 종목: 종목명 - {item.itemName}, 종목코드 - {item.itemCode}");
-                    myTelegramBot.sendTextMessageAsyncToBot($"✔📰 신규상장 : 종목명 - {item.itemName}, 종목코드 - {item.itemCode}");
+                    myTelegramBot.sendTextMessageAsyncToSwingBot($"✔📰 신규상장 : 종목명 - {item.itemName}, 종목코드 - {item.itemCode}");
                     stockItemService.createItem(item);
                     Thread.Sleep(500);
                     goto End;
@@ -98,7 +98,7 @@ namespace CloudRealtime.StockItem.controller
                 if (matchedItem.itemName != item.itemName) //종목코드는 같은데 종목명이 다른경우는 종목명을 업데이트 해 준다.
                 {
                     Logger.Info($"종목명이 바뀐 종목: 등록된 이름 - {matchedItem.itemName}, 바뀐 이름 - {item.itemName}");
-                    myTelegramBot.sendTextMessageAsyncToBot($"✔📰 종목명이 변경됨 : 원래 이름 - {matchedItem.itemName}, 바뀐 이름 - {item.itemName}");
+                    myTelegramBot.sendTextMessageAsyncToSwingBot($"✔📰 종목명이 변경됨 : 원래 이름 - {matchedItem.itemName}, 바뀐 이름 - {item.itemName}");
                     stockItemService.updateItemName(item);
                     Thread.Sleep(500);
                 }

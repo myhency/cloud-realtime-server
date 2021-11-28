@@ -94,7 +94,7 @@ namespace CloudRealtime.RealCondition.handler
 
                 logger.Info(message);
 
-                myTelegramBot.sendTextMessageAsyncToBot(message);
+                myTelegramBot.sendTextMessageAsyncToSwingBot(message);
             }
             //else if (e.sRQName.Contains("주식기본정보요청_빵셔틀단타"))
             //{

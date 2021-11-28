@@ -143,7 +143,7 @@ namespace CloudRealtime.SevenBread.handler
 
                     Logger.Info(message);
 
-                    myTelegramBot.sendTextMessageAsyncToBot(message);
+                    myTelegramBot.sendTextMessageAsyncToSwingBot(message);
 
                     insertIntoFireBase(sevenBreadItem);
                 }
@@ -176,7 +176,7 @@ namespace CloudRealtime.SevenBread.handler
 
                     Logger.Info(message);
 
-                    myTelegramBot.sendTextMessageAsyncToBot(message);
+                    myTelegramBot.sendTextMessageAsyncToSwingBot(message);
 
                     insertIntoFireBase(sevenBreadItem);
                 }

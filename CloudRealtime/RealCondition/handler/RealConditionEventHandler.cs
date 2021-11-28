@@ -117,7 +117,7 @@ namespace CloudRealtime.RealCondition.handler
                             DateTime startMarketTime = new DateTime(today.Year, today.Month, today.Day, 09, 0, 0);
                             string strNow = today.ToString("yyyy년 MM월 dd일");
                             string strDay = today.ToString("yyyy-MM-dd");
-                            this.myTelegramBot.sendTextMessageAsyncToBot(
+                            this.myTelegramBot.sendTextMessageAsyncToSwingBot(
                                 $"✔️ {strNow} 유통주식대비 거래량 비율 업데이트가 완료되었습니다. ");
                             break;
                         }

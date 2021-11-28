@@ -126,7 +126,7 @@ namespace CloudRealtime.RealTime.handler
                     Logger.Info(message);
 
                     // TODO. try/catch 로 감쌀 것
-                    myTelegramBot.sendTextMessageAsyncToBot(message);
+                    myTelegramBot.sendTextMessageAsyncToSwingBot(message);
 
                     //알리미 서버에 알람상태를 업데이트 한다.
                     alarmService.buyAlarm(alarm.alarmId);
@@ -158,7 +158,7 @@ namespace CloudRealtime.RealTime.handler
                     Logger.Info(message);
 
                     // TODO. try/catch 로 감쌀 것
-                    myTelegramBot.sendTextMessageAsyncToBot(message);
+                    myTelegramBot.sendTextMessageAsyncToSwingBot(message);
 
                     //알리미 서버에 알람상태를 업데이트 한다.
                     alarmService.losscutAlarm(alarm.alarmId);
