@@ -10,6 +10,8 @@ using Telegram.Bot.Args;
 using Telegram.Bot.Types.Enums;
 using Telegram.Bot.Types.InputFiles;
 using Telegram.Bot.Types.ReplyMarkups;
+using System.Configuration;
+using System.Collections.Specialized;
 
 namespace CloudRealtime.util
 {
@@ -17,7 +19,6 @@ namespace CloudRealtime.util
     {
         private const string START = "/start";
 
-        IniFile ini = new IniFile();
         private string telegramToken = "";
         private string swingTelegramToken = "";
         private TelegramBotClient bot;
@@ -32,11 +33,11 @@ namespace CloudRealtime.util
 
         private void initializer()
         {
-            ini.Load(Application.StartupPath + "\\settings.ini");
-            this.telegramToken = ini["Settings"]["ProdToken"].ToString();
-            this.swingTelegramToken = ini["Settings"]["SwingToken"].ToString();
-            this.userId = ini["Settings"]["UserId"].ToString();
-            this.swingId = ini["Settings"]["SwingId"].ToString();
+            this.telegramToken = ConfigurationManager.AppSettings.Get("ProdToken");
+            this.swingTelegramToken = ConfigurationManager.AppSettings.Get("SwingToken");
+            this.userId = ConfigurationManager.AppSettings.Get("ProdBotId");
+            this.swingId = ConfigurationManager.AppSettings.Get("SwingBotId");
+
 
             if (telegramToken.Equals("") || telegramToken == null)
             {
@@ -45,10 +46,11 @@ namespace CloudRealtime.util
             }
             else
             {
-                bot = new TelegramBotClient(telegramToken);
+                Console.WriteLine(this.telegramToken);
+                bot = new TelegramBotClient(this.telegramToken);
                 bot.OnMessage += bot_OnMessage;
                 bot.StartReceiving();
-                swingbot = new TelegramBotClient(swingTelegramToken);
+                swingbot = new TelegramBotClient(this.swingTelegramToken);
                 swingbot.OnMessage += bot_OnMessage;
                 swingbot.StartReceiving();
             }
@@ -68,20 +70,6 @@ namespace CloudRealtime.util
                 {
                     case START:
                         bot.SendTextMessageAsync(userId, "알람을 시작합니다.");
-                        ini["Settings"]["LicenseKey"] = ini["Settings"]["LicenseKey"].ToString();
-                        ini["Settings"]["Token"] = ini["Settings"]["Token"].ToString();
-                        ini["Settings"]["UserId"] = this.userId;
-                        ini.Save(Application.StartupPath + "\\settings.ini");
-
-                        //var menu = new InlineKeyboardMarkup(new[] { 
-                        //    new[]
-                        //    {
-                        //        new InlineKeyboardButton{ Text = "item", CallbackData = "1" },
-                        //        new InlineKeyboardButton{ Text = "item", CallbackData = "2" },
-                        //    }
-                        //});
-
-                        //bot.SendTextMessageAsync(userId, "Text", replyMarkup: menu);
                         break;
                     default:
                         break;

@@ -239,6 +239,7 @@
     <Compile Include="Alrime.cs" />
     <Compile Include="DailyCrawler.cs" />
     <Compile Include="IAlrime.cs" />
+    <Compile Include="model\Opt10081VO.cs" />
     <Compile Include="model\Opt10086VO.cs" />
     <Compile Include="RealCondition\controller\RealConditionController.cs" />
     <Compile Include="RealCondition\model\BreadShuttleData.cs" />
@@ -260,6 +261,7 @@
     <Compile Include="Settings.cs" />
     <Compile Include="SevenBread\controller\SevenBreadController.cs" />
     <Compile Include="SevenBread\handler\Opt10001EventHandler.cs" />
+    <Compile Include="SevenBread\handler\Opt10081EventHandler.cs" />
     <Compile Include="SevenBread\handler\Opt10086EventHandler.cs" />
     <Compile Include="SevenBread\handler\RealDataEventHandler.cs" />
     <Compile Include="SevenBread\model\SevenBreadDeletedItem.cs" />

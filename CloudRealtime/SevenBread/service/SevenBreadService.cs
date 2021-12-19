@@ -15,7 +15,7 @@ namespace CloudRealtime.SevenBread.service
     public partial class SevenBreadService
     {
         private static Logger Logger = LogManager.GetCurrentClassLogger();
-        private const string BASE_URL = "http://192.168.29.104:8080";
+        private const string BASE_URL = "http://192.168.29.189:8080";
         private string token;
         private RestClient client;
         private RestRequest request;
@@ -53,13 +53,13 @@ namespace CloudRealtime.SevenBread.service
             {
                 Logger.Info("Success to get a login token");
                 var jObject = JObject.Parse(response.Content);
-                return jObject.GetValue("data").ToString();
+                return jObject.SelectToken("data.token").ToString();
             }
         }
 
         public List<SevenBreadItem> getSevenBreadItemList()
         {
-            client = new RestClient(BASE_URL + "/api/v1/platform/sevenbread/item");
+            client = new RestClient(BASE_URL + "/api/v1/platform/v2/sevenbread/item");
             client.Timeout = -1;
             request = new RestRequest(Method.GET);
             request.AddParameter("Authorization", "Bearer " + this.token, ParameterType.HttpHeader);
@@ -85,14 +85,11 @@ namespace CloudRealtime.SevenBread.service
                     {
                         sevenBreadItemList.Add(new SevenBreadItem()
                         {
-                            id = long.Parse(item.GetValue("id").ToString()),
                             itemCode = item.GetValue("itemCode").ToString(),
                             itemName = item.GetValue("itemName").ToString(),
                             capturedPrice = item.GetValue("capturedPrice") == null ? 9999999 : int.Parse(item.GetValue("capturedPrice").ToString()),
-                            closingPrice = item.GetValue("closingPrice") == null ? 99999999 : int.Parse(item.GetValue("closingPrice").ToString()),
                             capturedDate = item.GetValue("capturedDate").ToString(),
                             majorHandler = item.GetValue("majorHandler").ToString(),
-                            theme = item.GetValue("theme").ToString(),
                         });
                     } catch (Exception e)
                     {
@@ -182,19 +179,94 @@ namespace CloudRealtime.SevenBread.service
             }
         }
 
-        public string updateSevenBreadItemCapturedDay(string itemCode, Opt10086VO opt10086VO)
+        public string updateSevenBreadChartToday(Opt10081VO opt10081VO)
         {
-            client = new RestClient(BASE_URL + "/api/v1/platform/sevenbread/item/" + itemCode);
+            client = new RestClient(BASE_URL + "/api/v1/platform/v2/sevenbread/item/daily/chart");
             client.Timeout = -1;
             request = new RestRequest(Method.PUT);
             request.AddParameter("Authorization", "Bearer " + this.token, ParameterType.HttpHeader);
             request.AddJsonBody(new
             {
-                closingPrice = opt10086VO.종가,
+                closingDate = opt10081VO.일자,
+                itemCode = opt10081VO.종목코드,
+                highestPrice = opt10081VO.고가,
+                lowestPrice = opt10081VO.저가,
+                closingPrice = opt10081VO.현재가,
+                modifyPriceType = opt10081VO.수정주가구분,
+                modifyRate = opt10081VO.수정비율,
+                modifyEvent = opt10081VO.수정주가이벤트,
+            });
+
+            response = client.Execute(request);
+
+            if (response.StatusCode == System.Net.HttpStatusCode.Conflict)
+            {
+                return "Conflict";
+            }
+
+            if (response.StatusCode != System.Net.HttpStatusCode.OK)
+            {
+                Logger.Error("Error to update today sevenbread item");
+                return "Fail";
+            }
+            else
+            {
+                Logger.Info("Success to update today sevenbread item");
+                return "Success";
+            }
+        }
+
+        public string updateSevenBreadItemBuyingInfo(string itemCode, Opt10086VO opt10086VO)
+        {
+            client = new RestClient(BASE_URL + "/api/v1/platform/v2/sevenbread/item/daily/buying");
+            client.Timeout = -1;
+            request = new RestRequest(Method.PUT);
+            request.AddParameter("Authorization", "Bearer " + this.token, ParameterType.HttpHeader);
+            request.AddJsonBody(new
+            {
+                itemCode = itemCode,
+                closingDate = opt10086VO.날짜,
+                wBuyAmount = opt10086VO.외인순매수,
+                gBuyAmount = opt10086VO.기관순매수,
+                pBuyAmount = opt10086VO.개인순매수
+            });
+
+            Logger.Debug(itemCode);
+            Logger.Debug(opt10086VO.날짜);
+            Logger.Debug(opt10086VO.외인순매수);
+            Logger.Debug(opt10086VO.기관순매수);
+            Logger.Debug(opt10086VO.개인순매수);
+
+            response = client.Execute(request);
+
+            if (response.StatusCode == System.Net.HttpStatusCode.Conflict)
+            {
+                return "Conflict";
+            }
+
+            if (response.StatusCode != System.Net.HttpStatusCode.OK)
+            {
+                Logger.Error("Error to update today buying sevenbread item");
+                return "Fail";
+            }
+            else
+            {
+                Logger.Info(response.Content.ToString());
+                Logger.Info("Success to update today buying sevenbread item");
+                return "Success";
+            }
+        }
+
+        public string updateSevenBreadItemCapturedDay(string itemCode, Opt10086VO opt10086VO)
+        {
+            client = new RestClient(BASE_URL + "/api/v1/platform/v2/sevenbread/item/" + itemCode);
+            client.Timeout = -1;
+            request = new RestRequest(Method.PUT);
+            request.AddParameter("Authorization", "Bearer " + this.token, ParameterType.HttpHeader);
+            request.AddJsonBody(new
+            {
                 capturedPrice = opt10086VO.종가,
-                fluctuationRate = opt10086VO.등락률,
-                priceByYesterday = opt10086VO.전일비,
-                volume = opt10086VO.거래량,
+                lowestPrice = opt10086VO.저가
             });
 
             response = client.Execute(request);
@@ -207,8 +279,9 @@ namespace CloudRealtime.SevenBread.service
             else
             {
                 Logger.Info("Success to update captured day sevenbread item");
-                var jObject = JObject.Parse(response.Content);
-                return jObject.GetValue("data").ToString();
+                //var jObject = JObject.Parse(response.Content);
+                //return jObject.GetValue("data").ToString();
+                return "success";
             }
         }
 

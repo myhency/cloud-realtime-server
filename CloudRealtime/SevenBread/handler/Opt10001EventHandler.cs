@@ -66,23 +66,23 @@ namespace CloudRealtime.SevenBread.handler
                 sevenBreadService.updateSevenBreadItemToday(opt10001VO);
                 string capturedDate = e.sRQName.Split('_')[3];
                 int capturedPrice = int.Parse(e.sRQName.Split('_')[4]);
-                sevenBreadService.createSevenBreadItemHistory(
-                    opt10001VO.종목명,
-                    opt10001VO.종목코드,
-                    opt10001VO.시가,
-                    opt10001VO.고가,
-                    opt10001VO.저가,
-                    opt10001VO.현재가,
-                    capturedDate,
-                    capturedPrice
-                );
+                //sevenBreadService.createSevenBreadItemHistory(
+                //    opt10001VO.종목명,
+                //    opt10001VO.종목코드,
+                //    opt10001VO.시가,
+                //    opt10001VO.고가,
+                //    opt10001VO.저가,
+                //    opt10001VO.현재가,
+                //    capturedDate,
+                //    capturedPrice
+                //);
             }
             else if (e.sRQName.Contains("주식기본정보요청_뉴007빵종가업데이트_"))
             {
                 Opt10001VO opt10001VO = getOpt10001VO(e.sTrCode, e.sRQName);
                 logger.Debug(e.sTrCode);
                 logger.Debug(e.sRQName);
-                sevenBreadService.updateSevenBreadItemToday(opt10001VO);
+                //sevenBreadService.updateSevenBreadItemToday(opt10001VO);
             }
         }
 
