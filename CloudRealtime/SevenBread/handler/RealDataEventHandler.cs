@@ -8,6 +8,8 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using System.Configuration;
+using System.Collections.Specialized;
 
 namespace CloudRealtime.SevenBread.handler
 {
@@ -22,6 +24,7 @@ namespace CloudRealtime.SevenBread.handler
         private List<SevenBreadItem> sevenBreadItemList = new List<SevenBreadItem>();
         private List<SevenBreadItem> realTimeUpSevenBreadItemList = new List<SevenBreadItem>();
         private List<SevenBreadItem> realTimeDownSevenBreadItemList = new List<SevenBreadItem>();
+        private static String baseFireBasePath = ConfigurationManager.AppSettings.Get("BaseFireBasePath");
 
         bool isMarketOpen = false;
 
@@ -137,9 +140,7 @@ namespace CloudRealtime.SevenBread.handler
                         $"현재가 : {String.Format("{0:#,###}", presentPrice)} ({fluctuationRate}%)\n" +
                         $"편입일 : {sevenBreadItem.capturedDate} \n" +
                         $"\n" +
-                        $"{sevenBreadItem.theme} \n" +
-                        $"\n" +
-                        $"https://m.alphasquare.co.kr/service/chart?code=" + sevenBreadItem.itemCode;
+                        $"{sevenBreadItem.theme} \n";
 
                     Logger.Info(message);
 
@@ -176,7 +177,11 @@ namespace CloudRealtime.SevenBread.handler
 
                     Logger.Info(message);
 
+<<<<<<< HEAD
                     myTelegramBot.sendTextMessageAsyncToSwingBot(message);
+=======
+                    //myTelegramBot.sendTextMessageAsyncToBot(message);
+>>>>>>> server-change
 
                     insertIntoFireBase(sevenBreadItem);
                 }
@@ -194,11 +199,6 @@ namespace CloudRealtime.SevenBread.handler
                 realTimeSevenBreadItem.fluctuationRateBy = Math.Round(fluctuationRateBy, 2);
 
                 updateToFireBase(realTimeSevenBreadItem);
-
-                //Logger.Debug($"[007빵] 매수알림나간 종목 실시간 가격 변동: " +
-                //    $"{realTimeSevenBreadItem.itemName}(기준가: {realTimeSevenBreadItem.capturedPrice}) " +
-                //    $"=> 현재가: {presentPrice}, " +
-                //    $"기준가대비 상승률: {realTimeSevenBreadItem.fluctuationRate}%, 알람시간: {realTimeSevenBreadItem.alarmedTime}");
             }
             //TODO. 007빵 손절알림이 나간 종목들에 대해 실시간 가격 감시 로직
             else if(e.sRealType.Equals("주식체결") && realTimeDownSevenBreadItemList.Exists(v => v.itemCode == e.sRealKey) && isMarketOpen)
@@ -213,11 +213,6 @@ namespace CloudRealtime.SevenBread.handler
                 realTimeSevenBreadItem.fluctuationRateBy = Math.Round(fluctuationRateBy, 2);
 
                 updateToFireBase(realTimeSevenBreadItem);
-
-                //Logger.Debug($"[007빵] 알림나간 종목 실시간 가격 변동: " +
-                //    $"{realTimeSevenBreadItem.itemName}(기준가: {realTimeSevenBreadItem.capturedPrice}) " +
-                //    $"=> 현재가: {presentPrice}, " +
-                //    $"기준가대비 상승률: {realTimeSevenBreadItem.fluctuationRate}%, 알람시간: {realTimeSevenBreadItem.alarmedTime}");
             }
         }
 
@@ -228,7 +223,7 @@ namespace CloudRealtime.SevenBread.handler
             DateTime today = DateTime.Now;
             string strNow = today.ToString("HH:mm:ss");
             string strToday = today.ToString("yyyyMMdd");
-            string path = $"sevenbread/alarm/{strToday}/{itemCode}";
+            string path = $"{baseFireBasePath}/alarm/{strToday}/{itemCode}";
 
             var data = new SevenBreadItem
             {
@@ -253,7 +248,7 @@ namespace CloudRealtime.SevenBread.handler
             string itemCode = sevenBreadItem.itemCode;
             DateTime today = DateTime.Now;
             string strToday = today.ToString("yyyyMMdd");
-            string path = $"sevenbread/alarm/{strToday}/{itemCode}";
+            string path = $"{baseFireBasePath}/alarm/{strToday}/{itemCode}";
 
             var data = new SevenBreadItem
             {
@@ -301,7 +296,7 @@ namespace CloudRealtime.SevenBread.handler
         {
             DateTime today = DateTime.Now;
             string strToday = today.ToString("yyyyMMdd");
-            string path = $"sevenbread/alarm/{strToday}/{itemCode}";
+            string path = $"{baseFireBasePath}/alarm/{strToday}/{itemCode}";
             FirebaseResponse response = await client.DeleteAsync(path);
             Logger.Debug($"[firebase] Success to delete data:{path} --> {response.StatusCode}");
         }

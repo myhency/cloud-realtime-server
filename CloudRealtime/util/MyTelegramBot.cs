@@ -95,7 +95,8 @@ namespace CloudRealtime.util
             try
             {
                 await bot.SendTextMessageAsync(long.Parse(this.userId), alarmMessage);
-            } catch (Exception e)
+            }
+            catch (Exception e)
             {
                 await swingbot.SendTextMessageAsync(long.Parse(this.swingId), e.Message);
             }
@@ -103,7 +104,14 @@ namespace CloudRealtime.util
 
         public async void sendTextMessageAsyncToSwingBot(string alarmMessage)
         {
-            await swingbot.SendTextMessageAsync(long.Parse(this.swingId), alarmMessage);
+            try
+            {
+                await swingbot.SendTextMessageAsync(long.Parse(this.swingId), alarmMessage);
+            }
+            catch (Exception e)
+            {
+                await swingbot.SendTextMessageAsync(long.Parse(this.swingId), e.Message);
+            }
         }
 
         public void sendFileAsyncToBot(string path)

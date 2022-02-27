@@ -23,5 +23,6 @@ namespace CloudRealtime.SevenBread.model
         public string alarmStatus { get; set; }
         public int presentPrice { get; set; }
         public double fluctuationRateBy { get; set; }
+        public int transactionCount { get; set; } = 0;
     }
 }

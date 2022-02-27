@@ -42,9 +42,15 @@ namespace CloudRealtime.SevenBread.handler
             string strDay = today.ToString("yyyy-MM-dd");
 
             this.axKHOpenAPI1.SetInputValue("종목코드", itemCode);
+<<<<<<< HEAD
             this.axKHOpenAPI1.SetInputValue("기준일자", strDay.Replace("-",""));
             this.axKHOpenAPI1.SetInputValue("수정주가구분", sujungJuga);
             int x = this.axKHOpenAPI1.CommRqData($"주식기본정보요청_{trName}_{itemCode}_{capturedDate.Replace("-","")}", "opt10081", 0, screenNumber.ToString());
+=======
+            this.axKHOpenAPI1.SetInputValue("기준일자", strDay.Replace("-", ""));
+            this.axKHOpenAPI1.SetInputValue("수정주가구분", sujungJuga);
+            int x = this.axKHOpenAPI1.CommRqData($"주식기본정보요청_{trName}_{itemCode}_{capturedDate.Replace("-", "")}", "opt10081", 0, screenNumber.ToString());
+>>>>>>> server-change
             logger.Debug($"requestTrOpt10081 result : {x}");
         }
 
@@ -71,9 +77,16 @@ namespace CloudRealtime.SevenBread.handler
         private List<Opt10081VO> getOpt10081VO(string sTrCode, string sRQName)
         {
             List<Opt10081VO> opt10081VOList = new List<Opt10081VO>();
+<<<<<<< HEAD
             for(int i = 0; i < 90; i++)
             {
                 Opt10081VO opt10081VO = new Opt10081VO { 
+=======
+            for (int i = 0; i < 90; i++)
+            {
+                Opt10081VO opt10081VO = new Opt10081VO
+                {
+>>>>>>> server-change
                     종목코드 = axKHOpenAPI1.GetCommData(sTrCode, sRQName, i, "종목코드").Trim(),
                     일자 = axKHOpenAPI1.GetCommData(sTrCode, sRQName, i, "일자").Trim(),
                     고가 = axKHOpenAPI1.GetCommData(sTrCode, sRQName, i, "고가").Trim(),
@@ -85,9 +98,15 @@ namespace CloudRealtime.SevenBread.handler
                 };
 
                 opt10081VOList.Add(opt10081VO);
+<<<<<<< HEAD
                 
             }
             
+=======
+
+            }
+
+>>>>>>> server-change
             return opt10081VOList;
         }
     }

@@ -4,6 +4,7 @@ using NLog;
 using RestSharp;
 using System;
 using System.Collections.Generic;
+using System.Configuration;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -13,7 +14,8 @@ namespace CloudRealtime.RealTime.service
     public partial class AlarmService
     {
         private static Logger Logger = LogManager.GetCurrentClassLogger();
-        private const string BASE_URL = "http://192.168.29.104:8080";
+        private const string BASE_URL = "http://myhency.duckdns.org:18080";
+        private static string V2BASE_URL = ConfigurationManager.AppSettings.Get("V2BaseUrl");
         private string token;
         private RestClient client;
         private RestRequest request;
@@ -27,7 +29,7 @@ namespace CloudRealtime.RealTime.service
 
         private string getToken()
         {
-            client = new RestClient(BASE_URL + "/api/v1/platform/auth/login");
+            client = new RestClient(V2BASE_URL + "/api/v1/platform/auth/login");
             client.Timeout = -1;
             request = new RestRequest(Method.POST);
             request.AddHeader("Content-Type", "application/json");
@@ -42,15 +44,16 @@ namespace CloudRealtime.RealTime.service
 
             response = client.Execute(request);
 
-            if(response.StatusCode != System.Net.HttpStatusCode.OK)
+            if (response.StatusCode != System.Net.HttpStatusCode.OK)
             {
                 Logger.Error("Error to get a login token");
                 return null;
-            } else
+            }
+            else
             {
                 Logger.Info("Success to get a login token");
                 var jObject = JObject.Parse(response.Content);
-                return jObject.GetValue("data").ToString();
+                return jObject.SelectToken("data.token").ToString();
             }
         }
 

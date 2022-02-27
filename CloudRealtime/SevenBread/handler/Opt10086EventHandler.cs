@@ -57,13 +57,34 @@ namespace CloudRealtime.SevenBread.handler
         private void axKHOpenAPI1_OnReceiveTrData(object sender, AxKHOpenAPILib._DKHOpenAPIEvents_OnReceiveTrDataEvent e)
         {
             logger.Debug("axKHOpenAPI1_OnReceiveTrData");
+<<<<<<< HEAD
             if (e.sRQName.Contains("주식기본정보요청_007빵_일별주가"))
+=======
+            if (e.sRQName.Contains("주식기본정보요청_007빵OLD_"))
+>>>>>>> server-change
             {
                 Opt10086VO opt10086VO = getOpt10086VO(e.sTrCode, e.sRQName);
                 logger.Debug(e.sTrCode);
                 logger.Debug(e.sRQName);
 
                 sevenBreadService.updateSevenBreadItemCapturedDay(e.sRQName.Split('_')[3], opt10086VO);
+
+            }
+            else if (e.sRQName.Contains("주식기본정보요청_007빵_일별수급"))
+            {
+                Opt10086VO opt10086VO = getOpt10086VO(e.sTrCode, e.sRQName);
+                logger.Debug(e.sTrCode);
+                logger.Debug(e.sRQName);
+
+                sevenBreadService.updateSevenBreadItemBuyingInfo(e.sRQName.Split('_')[3], opt10086VO);
+
+            } else if (e.sRQName.Contains("주식기본정보요청_007빵_일별주가"))
+            {
+                Opt10086VO opt10086VO = getOpt10086VO(e.sTrCode, e.sRQName);
+                logger.Debug(e.sTrCode);
+                logger.Debug(e.sRQName);
+
+                sevenBreadService.updateSevenBreadV2ItemCapturedDay(e.sRQName.Split('_')[3], opt10086VO);
 
             }
             else if (e.sRQName.Contains("주식기본정보요청_007빵_일별수급"))
@@ -107,7 +128,10 @@ namespace CloudRealtime.SevenBread.handler
                 int.Parse(외인순매수.Substring(1, 외인순매수.Length - 1)) :
                 0;
 
+<<<<<<< HEAD
 
+=======
+>>>>>>> server-change
             return opt10086VO;
         }
     }
