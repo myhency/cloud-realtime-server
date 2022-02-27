@@ -26,11 +26,11 @@ namespace CloudRealtime.RealTime.controller
 
         public RealTimeController(AxKHOpenAPILib.AxKHOpenAPI axKHOpenAPI)
         {
-            this.alarmService = new AlarmService();
+            //this.alarmService = new AlarmService();
             this.myTelegramBot = new MyTelegramBot();
             //알리미서버에서 가져오는 알람리스트
             //COMPLETE. 실시간으로 입력되는 알람은 Kafka consumer가 가져오도록 구현해야 함.
-            this.alarmList = this.alarmService.getAlarmList();
+            //this.alarmList = this.alarmService.getAlarmList();
             this.realDataEventHandler = new RealDataEventHandler(axKHOpenAPI, this.alarmList);
             this.opt10001EventHandler = new Opt10001EventHandler(axKHOpenAPI);
 
@@ -110,13 +110,13 @@ namespace CloudRealtime.RealTime.controller
 
         private void initialize()
         {
-            Logger.Info("===== 알리미리스트 종목 등록 중...");
-            foreach (Alarm item in this.alarmList)
-            {
-                Logger.Info($"{item.itemName}({item.itemCode}) 종목이 등록되었습니다.");
-                this.realDataEventHandler.setRealReg("2000", item.itemCode, "20;10;11;12;15;13;14;16;17;18;30", "1");
-            }
-            this.myTelegramBot.sendTextMessageAsyncToSwingBot("[훈련소알리미] 종목등록완료");
+            //Logger.Info("===== 알리미리스트 종목 등록 중...");
+            //foreach (Alarm item in this.alarmList)
+            //{
+            //    Logger.Info($"{item.itemName}({item.itemCode}) 종목이 등록되었습니다.");
+            //    this.realDataEventHandler.setRealReg("2000", item.itemCode, "20;10;11;12;15;13;14;16;17;18;30", "1");
+            //}
+            //this.myTelegramBot.sendTextMessageAsyncToSwingBot("[훈련소알리미] 종목등록완료");
 
 
             Thread t1 = new Thread(new ThreadStart(() =>
@@ -124,7 +124,7 @@ namespace CloudRealtime.RealTime.controller
                 consumer(this.realDataEventHandler);
             }));
 
-            t1.Start();
+            //t1.Start();
             this.myTelegramBot.sendTextMessageAsyncToSwingBot("[훈련소알리미] Kafka 실시간 쓰레드 시작");
 
             Thread t2 = new Thread(new ThreadStart(() =>
@@ -169,7 +169,7 @@ namespace CloudRealtime.RealTime.controller
                 }
             }));
 
-            t2.Start();
+            //t2.Start();
         }
     }
 }

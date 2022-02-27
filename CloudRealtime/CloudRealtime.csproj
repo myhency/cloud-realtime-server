@@ -237,8 +237,10 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Alrime.cs" />
+    <Compile Include="controllers\CloudControllers.cs" />
     <Compile Include="DailyCrawler.cs" />
     <Compile Include="IAlrime.cs" />
+    <Compile Include="model\Opt10081VO.cs" />
     <Compile Include="model\Opt10086VO.cs" />
     <Compile Include="RealCondition\controller\RealConditionController.cs" />
     <Compile Include="RealCondition\model\BreadShuttleData.cs" />
@@ -257,9 +259,11 @@
     <Compile Include="RealTime\handler\RealDataEventHandler.cs" />
     <Compile Include="RealTime\model\Alarm.cs" />
     <Compile Include="RealTime\service\AlarmService.cs" />
+    <Compile Include="services\CloudService.cs" />
     <Compile Include="Settings.cs" />
     <Compile Include="SevenBread\controller\SevenBreadController.cs" />
     <Compile Include="SevenBread\handler\Opt10001EventHandler.cs" />
+    <Compile Include="SevenBread\handler\Opt10081EventHandler.cs" />
     <Compile Include="SevenBread\handler\Opt10086EventHandler.cs" />
     <Compile Include="SevenBread\handler\RealDataEventHandler.cs" />
     <Compile Include="SevenBread\model\SevenBreadDeletedItem.cs" />

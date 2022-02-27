@@ -86,15 +86,11 @@ namespace CloudRealtime.RealCondition.handler
                         $"250일 최고 : {String.Format("{0:#,###}", opt10001VO.최고250)} / {opt10001VO.최고가일250:yyyy-MM-dd} / {opt10001VO.최고가대비율250}% \n" +
                         $"250일 최저 : {String.Format("{0:#,###}", opt10001VO.최저250)} / {opt10001VO.최저가일250:yyyy-MM-dd} / {opt10001VO.최저가대비율250}% \n" +
                         $"외인소진률 : {opt10001VO.외인소진률}% \n" +
-                        $"시가총액 / 매출액 :  {String.Format("{0:#,###}", opt10001VO.시가총액)}억 /  {String.Format("{0:#,###}", opt10001VO.매출액)}억\n" +
-                        "차트보기 \n" +
-                        "https://m.alphasquare.co.kr/service/chart?code=" + opt10001VO.종목코드 + "\n" +
-                        "종목정보(알파스퀘어) \n" +
-                        "https://alphasquare.co.kr/home/stock/stock-summary?code=" + opt10001VO.종목코드 + "\n";
+                        $"시가총액 / 매출액 :  {String.Format("{0:#,###}", opt10001VO.시가총액)}억 /  {String.Format("{0:#,###}", opt10001VO.매출액)}억";
 
                 logger.Info(message);
 
-                myTelegramBot.sendTextMessageAsyncToBot(message);
+                myTelegramBot.sendTextMessageAsyncToSwingBot(message);
             }
             //else if (e.sRQName.Contains("주식기본정보요청_빵셔틀단타"))
             //{

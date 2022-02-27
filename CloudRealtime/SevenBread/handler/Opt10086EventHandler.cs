@@ -57,7 +57,7 @@ namespace CloudRealtime.SevenBread.handler
         private void axKHOpenAPI1_OnReceiveTrData(object sender, AxKHOpenAPILib._DKHOpenAPIEvents_OnReceiveTrDataEvent e)
         {
             logger.Debug("axKHOpenAPI1_OnReceiveTrData");
-            if (e.sRQName.Contains("주식기본정보요청_007빵_"))
+            if (e.sRQName.Contains("주식기본정보요청_007빵OLD_"))
             {
                 Opt10086VO opt10086VO = getOpt10086VO(e.sTrCode, e.sRQName);
                 logger.Debug(e.sTrCode);
@@ -65,17 +65,56 @@ namespace CloudRealtime.SevenBread.handler
 
                 sevenBreadService.updateSevenBreadItemCapturedDay(e.sRQName.Split('_')[2], opt10086VO);
 
+            } else if (e.sRQName.Contains("주식기본정보요청_007빵_일별주가"))
+            {
+                Opt10086VO opt10086VO = getOpt10086VO(e.sTrCode, e.sRQName);
+                logger.Debug(e.sTrCode);
+                logger.Debug(e.sRQName);
+
+                sevenBreadService.updateSevenBreadV2ItemCapturedDay(e.sRQName.Split('_')[3], opt10086VO);
+
+            }
+            else if (e.sRQName.Contains("주식기본정보요청_007빵_일별수급"))
+            {
+                Opt10086VO opt10086VO = getOpt10086VO(e.sTrCode, e.sRQName);
+                logger.Debug(e.sTrCode);
+                logger.Debug(e.sRQName);
+
+                sevenBreadService.updateSevenBreadItemBuyingInfo(e.sRQName.Split('_')[3], opt10086VO);
+
             }
         }
 
         private Opt10086VO getOpt10086VO(string sTrCode, string sRQName)
         {
             Opt10086VO opt10086VO = new Opt10086VO();
+            string 개인순매수 = axKHOpenAPI1.GetCommData(sTrCode, sRQName, 0, "개인순매수").Trim();
+            string 기관순매수 = axKHOpenAPI1.GetCommData(sTrCode, sRQName, 0, "기관순매수").Trim();
+            string 외인순매수 = axKHOpenAPI1.GetCommData(sTrCode, sRQName, 0, "외인순매수").Trim();
+
+            opt10086VO.날짜 = axKHOpenAPI1.GetCommData(sTrCode, sRQName, 0, "날짜").Trim();
             opt10086VO.종가 = Math.Abs(int.Parse(axKHOpenAPI1.GetCommData(sTrCode, sRQName, 0, "종가").Trim()));
             opt10086VO.거래량 = int.Parse(axKHOpenAPI1.GetCommData(sTrCode, sRQName, 0, "거래량").Trim());
             opt10086VO.등락률 = float.Parse(axKHOpenAPI1.GetCommData(sTrCode, sRQName, 0, "등락률").Trim());
             opt10086VO.전일비 = int.Parse(axKHOpenAPI1.GetCommData(sTrCode, sRQName, 0, "전일비").Trim());
-            
+            opt10086VO.고가 = int.Parse(axKHOpenAPI1.GetCommData(sTrCode, sRQName, 0, "고가").Trim());
+            opt10086VO.저가 = Math.Abs(int.Parse(axKHOpenAPI1.GetCommData(sTrCode, sRQName, 0, "저가").Trim()));
+            opt10086VO.개인순매수 = 개인순매수.Contains("+") ?
+                int.Parse(개인순매수.Substring(1, 개인순매수.Length - 1)) :
+                개인순매수.Contains("--") ?
+                int.Parse(개인순매수.Substring(1, 개인순매수.Length - 1)) :
+                0;
+            opt10086VO.기관순매수 = 기관순매수.Contains("+") ?
+                int.Parse(기관순매수.Substring(1, 기관순매수.Length - 1)) :
+                기관순매수.Contains("--") ?
+                int.Parse(기관순매수.Substring(1, 기관순매수.Length - 1)) :
+                0;
+            opt10086VO.외인순매수 = 외인순매수.Contains("+") ?
+                int.Parse(외인순매수.Substring(1, 외인순매수.Length - 1)) :
+                외인순매수.Contains("--") ?
+                int.Parse(외인순매수.Substring(1, 외인순매수.Length - 1)) :
+                0;
+
             return opt10086VO;
         }
     }

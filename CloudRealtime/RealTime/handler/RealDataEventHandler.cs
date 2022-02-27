@@ -119,9 +119,7 @@ namespace CloudRealtime.RealTime.handler
                         $"\n" +
                         $"{alarm.comment} \n" +
                         $"\n" +
-                        $"{alarm.theme} \n" +
-                        $"\n" +
-                        $"https://m.alphasquare.co.kr/service/chart?code=" + alarm.itemCode;
+                        $"{alarm.theme} \n";
 
                     Logger.Info(message);
 
@@ -151,14 +149,12 @@ namespace CloudRealtime.RealTime.handler
                         $"\n" +
                         $"{alarm.comment} \n" +
                         $"\n" +
-                        $"{alarm.theme} \n" +
-                        $"\n" +
-                        $"https://m.alphasquare.co.kr/service/chart?code=" + alarm.itemCode;
+                        $"{alarm.theme} \n";
 
                     Logger.Info(message);
 
                     // TODO. try/catch 로 감쌀 것
-                    myTelegramBot.sendTextMessageAsyncToBot(message);
+                    // myTelegramBot.sendTextMessageAsyncToBot(message);
 
                     //알리미 서버에 알람상태를 업데이트 한다.
                     alarmService.losscutAlarm(alarm.alarmId);
